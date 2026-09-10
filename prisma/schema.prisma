@@ -1,0 +1,373 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String          @id @default(cuid())
+  name             String?
+  email            String          @unique
+  emailVerified    DateTime?
+  passwordHash     String?
+  image            String?
+  role             String          @default("TRAINEE") // TRAINEE, EMPLOYER, TRAINING_PROVIDER, GOVERNMENT_ADMIN
+  adminApproved    Boolean         @default(false)
+  consentGiven     Boolean         @default(true)
+  consentTimestamp DateTime        @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  traineeProfile   TraineeProfile?
+  employerProfile  EmployerProfile?
+  providerProfile  TrainingProviderProfile?
+  auditLogs        AuditLog[]
+  consentRecords   ConsentRecord[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TraineeProfile {
+  id               String          @id @default(cuid())
+  userId           String          @unique
+  traineeId        String          @unique // e.g. CLP-2026-XXXXX
+  dateOfBirth      DateTime?
+  gender           String?
+  district         String
+  state            String          @default("National")
+  educationLevel   String?
+  phone            String?
+  bio              String?
+  currentStatus    String          @default("TRAINING") // TRAINING, CERTIFIED, EMPLOYED, SELF_EMPLOYED, APPRENTICESHIP, UNEMPLOYED, FURTHER_STUDIES
+  targetRole       String?
+  targetSalaryMin  Int?
+  targetSalaryMax  Int?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills           TraineeSkill[]
+  enrollments      Enrollment[]
+  certifications   Certification[]
+  employmentRecords EmploymentRecord[]
+  selfEmployments  SelfEmploymentRecord[]
+  apprenticeships  ApprenticeshipRecord[]
+  followUps        FollowUp[]
+  nonPlacements    NonPlacementRecord[]
+  assessments      Assessment[]
+}
+
+model EmployerProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  companyName        String
+  industry           String
+  district           String
+  state              String             @default("National")
+  companySize        String?
+  website            String?
+  contactEmail       String
+  isVerified         Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verifiedEmployments EmploymentRecord[]
+}
+
+model TrainingProviderProfile {
+  id                  String            @id @default(cuid())
+  userId              String            @unique
+  institutionName     String
+  accreditationNumber String?
+  centerType          String            @default("Vocational Skill Center")
+  district            String
+  state               String            @default("National")
+  contactEmail        String
+  isVerified          Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programs            TrainingProgram[]
+}
+
+model TrainingProgram {
+  id             String                  @id @default(cuid())
+  providerId     String
+  title          String
+  code           String                  @unique
+  sector         String
+  description    String
+  durationWeeks  Int
+  minHours       Int
+  status         String                  @default("ACTIVE")
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  provider       TrainingProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  courses        Course[]
+  enrollments    Enrollment[]
+  certifications Certification[]
+  nonPlacements  NonPlacementRecord[]
+}
+
+model Course {
+  id              String          @id @default(cuid())
+  programId       String
+  title           String
+  level           String          @default("Foundation")
+  description     String
+  curriculum      String?
+  requiredPrereqs String?
+
+  program         TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id                   String          @id @default(cuid())
+  traineeId            String
+  programId            String
+  enrollmentDate       DateTime        @default(now())
+  completionDate       DateTime?
+  attendancePercentage Float           @default(100.0)
+  status               String          @default("IN_PROGRESS") // ENROLLED, IN_PROGRESS, COMPLETED, DROPPED, FAILED
+  grade                String?
+  createdAt            DateTime        @default(now())
+
+  trainee              TraineeProfile  @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  program              TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  assessments          Assessment[]
+}
+
+model Assessment {
+  id             String         @id @default(cuid())
+  enrollmentId   String
+  traineeId      String
+  title          String
+  assessmentDate DateTime       @default(now())
+  maxScore       Float          @default(100.0)
+  scoreObtained  Float
+  passed         Boolean        @default(true)
+  feedback       String?
+  createdAt      DateTime       @default(now())
+
+  enrollment     Enrollment     @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  trainee        TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+}
+
+model Certification {
+  id               String          @id @default(cuid())
+  traineeId        String
+  programId        String
+  certificateNumber String         @unique
+  credentialUrl    String?
+  issueDate        DateTime        @default(now())
+  expiryDate       DateTime?
+  issuingAuthority String          @default("National Skill Development Board")
+  verified         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+
+  trainee          TraineeProfile  @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  program          TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id           String         @id @default(cuid())
+  name         String         @unique
+  category     String         // Technical, Soft Skill, Domain
+  standardCode String?
+  description  String?
+
+  traineeSkills TraineeSkill[]
+}
+
+model TraineeSkill {
+  id                   String         @id @default(cuid())
+  traineeId            String
+  skillId              String
+  proficiencyLevel     String         @default("INTERMEDIATE") // BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
+  verifiedByAssessment Boolean        @default(false)
+  verifiedByEmployer   Boolean        @default(false)
+  addedAt              DateTime       @default(now())
+
+  trainee              TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  skill                Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([traineeId, skillId])
+}
+
+model EmploymentRecord {
+  id                   String           @id @default(cuid())
+  traineeId            String
+  employerId           String?
+  companyName          String
+  jobTitle             String
+  locationDistrict     String
+  locationState        String           @default("National")
+  monthlySalary        Int
+  employmentType       String           @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP, FREELANCE
+  startDate            DateTime
+  endDate              DateTime?
+  isCurrent            Boolean          @default(true)
+  skillRelevanceScore  Int              @default(4) // 1 to 5
+  verificationStatus   String           @default("SELF_REPORTED") // SELF_REPORTED, PENDING_VERIFICATION, EMPLOYER_VERIFIED, REJECTED
+  verificationNotes    String?
+  verifiedAt           DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  trainee              TraineeProfile   @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  employer             EmployerProfile? @relation(fields: [employerId], references: [id], onDelete: SetNull)
+}
+
+model SelfEmploymentRecord {
+  id               String         @id @default(cuid())
+  traineeId        String
+  businessName     String
+  businessType     String         // Retail, Services, Manufacturing, Digital Freelancing
+  sector           String
+  startDate        DateTime
+  monthlyNetIncome Int
+  employeesHired   Int            @default(0)
+  skillsApplied    String?
+  businessStatus   String         @default("ACTIVE") // ACTIVE, SCALING, PAUSED, CLOSED
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  trainee          TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+}
+
+model ApprenticeshipRecord {
+  id                 String         @id @default(cuid())
+  traineeId          String
+  hostOrganization   String
+  tradeRole          String
+  stipendAmount      Int
+  startDate          DateTime
+  endDate            DateTime?
+  isCompleted        Boolean        @default(false)
+  offeredFullTimeJob Boolean        @default(false)
+  skillsAcquired     String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  trainee            TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+}
+
+model FollowUp {
+  id                     String         @id @default(cuid())
+  traineeId              String
+  milestoneDays          Int            // 30, 90, 180, 365
+  scheduledDate          DateTime
+  completedDate          DateTime?
+  isCompleted            Boolean        @default(false)
+  isEmployed             Boolean?
+  employmentType         String?
+  companyName            String?
+  jobTitle               String?
+  currentSalary          Int?
+  sameEmployerAsPlacement Boolean?
+  skillRelevanceScore    Int?           // 1 to 5
+  promotionReceived      Boolean?       @default(false)
+  wageIncreasePercent    Float?         @default(0.0)
+  nonPlacementReason     String?
+  nonPlacementNotes      String?
+  feedback               String?
+  createdAt              DateTime       @default(now())
+
+  trainee                TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+}
+
+model NonPlacementRecord {
+  id             String           @id @default(cuid())
+  traineeId      String
+  programId      String?
+  primaryReason  String           // SKILL_GAP, LACK_OF_LOCAL_JOBS, SALARY_MISMATCH, COMMUNICATION_SKILLS, LOCATION_MOBILITY, FURTHER_EDUCATION, PERSONAL_REASON, OTHER
+  details        String?
+  recordedAt     DateTime         @default(now())
+
+  trainee        TraineeProfile   @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  program        TrainingProgram? @relation(fields: [programId], references: [id], onDelete: SetNull)
+}
+
+model AIInsight {
+  id               String   @id @default(cuid())
+  targetType       String   // TRAINEE, COURSE, DISTRICT, PROVIDER, POLICY
+  targetId         String
+  insightType      String   // SKILL_GAP, RISK_ALERT, CAREER_PATH, POLICY_RECOMMENDATION, WAGE_BENCHMARK
+  title            String
+  score            Float?
+  explanation      String
+  recommendations  String?  // JSON string
+  createdAt        DateTime @default(now())
+}
+
+model PolicyRecommendation {
+  id                String   @id @default(cuid())
+  district          String?
+  sector            String?
+  priority          String   @default("HIGH") // HIGH, MEDIUM, LOW
+  issueSummary      String
+  recommendedAction String
+  dataEvidence      String
+  status            String   @default("OPEN") // OPEN, UNDER_REVIEW, IMPLEMENTED
+  createdAt         DateTime @default(now())
+}
+
+model ConsentRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  purpose           String
+  dataFieldsGranted String
+  ipAddress         String?
+  userAgent         String?
+  grantedAt         DateTime @default(now())
+  revokedAt         DateTime?
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  role           String?
+  action         String
+  targetEntity   String
+  targetEntityId String?
+  metadata       String?  // JSON string
+  ipAddress      String?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
