@@ -39,7 +39,7 @@ interface SidebarItem {
 }
 
 interface DashboardSidebarProps {
-  role: "TRAINEE" | "EMPLOYER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN";
+  role: "TRAINEE" | "STUDENT" | "TRAINER" | "EMPLOYER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "ADMINISTRATOR";
   title: string;
   userEmail?: string;
 }
@@ -50,12 +50,14 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
   const getLinks = (): SidebarItem[] => {
     switch (role) {
       case "TRAINEE":
+      case "STUDENT":
         return [
           { label: "Dashboard", href: "/trainee", icon: Home },
           { label: "My Career", href: "/trainee/career-target", icon: Target },
           { label: "Skills", href: "/trainee/skills", icon: Award },
           { label: "Roadmap", href: "/trainee/roadmap", icon: BookOpen },
-          { label: "Career Identity", href: "/trainee/identity", icon: User },
+          { label: "Profile & Resume", href: "/trainee/profile", icon: User },
+          { label: "Career Identity", href: "/trainee/identity", icon: Award },
           { label: "Training", href: "/trainee/training", icon: GraduationCap },
           { label: "Certifications", href: "/trainee/certifications", icon: Award },
           { label: "Jobs", href: "/trainee/jobs", icon: Briefcase },
@@ -67,6 +69,15 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
           { label: "Settings & Consent", href: "/trainee/settings", icon: Settings },
         ];
 
+      case "TRAINER":
+        return [
+          { label: "Dashboard", href: "/trainer", icon: Home },
+          { label: "Assigned Batches", href: "/trainer/batches", icon: BookOpen },
+          { label: "Learners Roster", href: "/trainer/learners", icon: Users },
+          { label: "Assessments", href: "/trainer/assessments", icon: Award },
+          { label: "Trainer Profile", href: "/trainer/profile", icon: User },
+        ];
+
       case "EMPLOYER":
         return [
           { label: "Dashboard", href: "/employer", icon: Home },
@@ -75,6 +86,7 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
           { label: "Candidates", href: "/employer/candidates", icon: Users },
           { label: "Applications", href: "/employer/applications", icon: ClipboardList },
           { label: "Verification Queue", href: "/employer/verifications", icon: CheckSquare },
+          { label: "Bulk Verification", href: "/employer/bulk-verify", icon: Shield },
           { label: "Verified Employees", href: "/employer/employees", icon: Users },
           { label: "Retention Analytics", href: "/employer/analytics", icon: BarChart3 },
         ];
@@ -88,8 +100,10 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
         ];
 
       case "GOVERNMENT_ADMIN":
+      case "ADMINISTRATOR":
         return [
           { label: "Executive Overview", href: "/admin", icon: Home },
+          { label: "Policy Simulator", href: "/admin/simulator", icon: Target },
           { label: "Outcome Intelligence", href: "/admin/outcomes", icon: Briefcase },
           { label: "District Intelligence", href: "/admin/districts", icon: MapPin },
           { label: "Course Performance", href: "/admin/courses", icon: BookOpen },
@@ -160,15 +174,12 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
         </nav>
       </div>
 
-      {/* Bottom Switch Portal Helper */}
-      <div className="pt-4 border-t border-border mt-6">
-        <Link
-          href="/signin"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-muted hover:text-charcoal-800 hover:bg-sage-50 transition"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Switch Role / Portal</span>
-        </Link>
+      {/* Verified Status Footer */}
+      <div className="pt-4 border-t border-border mt-6 text-center">
+        <span className="text-[10px] text-muted inline-flex items-center justify-center gap-1 font-medium">
+          <Shield className="w-3 h-3 text-emerald-700" />
+          <span>Role Session Protected</span>
+        </span>
       </div>
     </aside>
   );

@@ -46,7 +46,7 @@ export default async function HomePage() {
       <div className="amra-ambient-top" />
       <div className="amra-ambient-dome" />
 
-      <Navbar />
+      {/* Navbar removed from landing page for cleaner hero experience */}
 
       <main className="flex-1 z-10">
         
@@ -75,19 +75,19 @@ export default async function HomePage() {
           {/* Dual Primary Call-to-Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link
-              href="/signin?role=TRAINEE"
+              href="/signin"
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-sm tracking-wide shadow-elevated hover:shadow-glow transition-all flex items-center justify-center gap-2 group"
             >
-              <span>I&apos;m a Trainee</span>
+              <span>Access Role Portal</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
 
             <Link
-              href="/signin?role=GOVERNMENT_ADMIN"
+              href="/how-it-works"
               className="w-full sm:w-auto px-8 py-3.5 rounded-full glass-pill hover:bg-white text-charcoal-800 font-semibold text-sm tracking-wide border border-border shadow-soft transition-all flex items-center justify-center gap-2"
             >
-              <Landmark className="w-4 h-4 text-emerald-700" />
-              <span>I&apos;m an Administrator</span>
+              <Layers className="w-4 h-4 text-emerald-700" />
+              <span>How It Works</span>
             </Link>
           </div>
 
@@ -288,10 +288,10 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                href="/trainee"
+                href="/login/student"
                 className="text-xs font-semibold text-emerald-800 hover:text-emerald-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
               >
-                <span>Enter Trainee Portal</span>
+                <span>Access Student Portal</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -310,10 +310,10 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                href="/employer"
+                href="/login/employer"
                 className="text-xs font-semibold text-purple-800 hover:text-purple-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
               >
-                <span>Enter Employer Portal</span>
+                <span>Access Employer Portal</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -332,10 +332,10 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                href="/provider"
+                href="/login/provider"
                 className="text-xs font-semibold text-blue-800 hover:text-blue-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
               >
-                <span>Enter Provider Portal</span>
+                <span>Access Provider Portal</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -354,10 +354,10 @@ export default async function HomePage() {
                 </p>
               </div>
               <Link
-                href="/admin"
+                href="/login/government"
                 className="text-xs font-semibold text-emerald-800 hover:text-emerald-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
               >
-                <span>Enter Admin Dashboard</span>
+                <span>Access Government Portal</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>

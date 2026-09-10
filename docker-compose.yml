@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: careerloop-web
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./dev.db
+      - NEXTAUTH_SECRET=careerloop-prod-super-secret-key-replace-in-env
+      - NEXTAUTH_URL=http://localhost:3000
+    volumes:
+      - sqlite_data:/app/prisma
+
+volumes:
+  sqlite_data:

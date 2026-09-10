@@ -26,6 +26,7 @@ model User {
   traineeProfile   TraineeProfile?
   employerProfile  EmployerProfile?
   providerProfile  TrainingProviderProfile?
+  trainerProfile   TrainerProfile?
   auditLogs        AuditLog[]
   consentRecords   ConsentRecord[]
 }
@@ -62,12 +63,17 @@ model TraineeProfile {
   userId           String          @unique
   traineeId        String          @unique // e.g. CLP-2026-XXXXX
   dateOfBirth      DateTime?
+  age              Int?
   gender           String?
   district         String
   state            String          @default("National")
   educationLevel   String?
   phone            String?
   bio              String?
+  resumeUrl        String?
+  resumeFileName   String?
+  resumeParsedData String?         // JSON cache of extracted resume competencies & metadata
+  resumeUploadedAt DateTime?
   currentStatus    String          @default("TRAINING") // TRAINING, CERTIFIED, EMPLOYED, SELF_EMPLOYED, APPRENTICESHIP, UNEMPLOYED, FURTHER_STUDIES
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -273,6 +279,7 @@ model TrainingProviderProfile {
 
   user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   programs            TrainingProgram[]
+  trainers            TrainerProfile[]
 }
 
 model TrainingProgram {
@@ -291,6 +298,7 @@ model TrainingProgram {
 
   provider       TrainingProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
   courses        Course[]
+  batches        Batch[]
   enrollments    Enrollment[]
   certifications Certification[]
   nonPlacements  NonPlacementRecord[]
@@ -312,6 +320,7 @@ model Enrollment {
   id                   String          @id @default(cuid())
   traineeId            String
   programId            String
+  batchId              String?
   enrollmentDate       DateTime        @default(now())
   completionDate       DateTime?
   attendancePercentage Float?          // null until tracked — no fake default
@@ -321,7 +330,46 @@ model Enrollment {
 
   trainee              TraineeProfile  @relation(fields: [traineeId], references: [id], onDelete: Cascade)
   program              TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  batch                Batch?          @relation(fields: [batchId], references: [id], onDelete: SetNull)
   assessments          Assessment[]
+}
+
+// ─── TRAINER & BATCHES ───────────────────────────────────────────────────
+
+model TrainerProfile {
+  id               String                 @id @default(cuid())
+  userId           String                 @unique
+  providerId       String
+  name             String
+  email            String
+  phone            String?
+  specialization   String?
+  bio              String?
+  status           String                 @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider         TrainingProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  batches          Batch[]
+}
+
+model Batch {
+  id             String          @id @default(cuid())
+  programId      String
+  trainerId      String?
+  name           String          // e.g. "Batch 2026-Alpha"
+  batchCode      String          @unique // e.g. "BCH-DEV-01"
+  startDate      DateTime        @default(now())
+  endDate        DateTime?
+  status         String          @default("ACTIVE") // UPCOMING, ACTIVE, COMPLETED
+  maxCapacity    Int             @default(30)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  program        TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  trainer        TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  enrollments    Enrollment[]
 }
 
 model Assessment {

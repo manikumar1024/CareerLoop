@@ -4,6 +4,8 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 
+export type UserRole = "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER" | "ADMINISTRATOR";
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -26,9 +28,10 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "CareerLoop Account",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "trainee@careerloop.gov.in" },
+        email: { label: "Email", type: "email", placeholder: "user@careerloop.gov.in" },
         password: { label: "Password", type: "password" },
         role: { label: "Role", type: "text" },
+        expectedRole: { label: "Expected Role", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email) {
@@ -44,13 +47,13 @@ export const authOptions: NextAuthOptions = {
             traineeProfile: true,
             employerProfile: true,
             providerProfile: true,
+            trainerProfile: true,
           },
         });
 
         // If user does not exist and a password was supplied, create user if onboarding or demo
         if (!user) {
-          // If role was specified during registration / quick access
-          const role = credentials.role || "TRAINEE";
+          const role = credentials.expectedRole || credentials.role || "TRAINEE";
           const hashedPassword = credentials.password 
             ? await bcrypt.hash(credentials.password, 10) 
             : await bcrypt.hash("CareerLoop2026!", 10);
@@ -61,12 +64,13 @@ export const authOptions: NextAuthOptions = {
               name: email.split("@")[0].replace(".", " ").replace(/\b\w/g, l => l.toUpperCase()),
               passwordHash: hashedPassword,
               role,
-              adminApproved: role === "GOVERNMENT_ADMIN" ? true : false,
+              adminApproved: role === "GOVERNMENT_ADMIN" || role === "ADMINISTRATOR" ? true : false,
             },
             include: {
               traineeProfile: true,
               employerProfile: true,
               providerProfile: true,
+              trainerProfile: true,
             },
           });
         } else if (credentials.password && user.passwordHash) {
@@ -74,6 +78,36 @@ export const authOptions: NextAuthOptions = {
           if (!isValid) {
             throw new Error("Invalid password credentials.");
           }
+        }
+
+        // 2. Strict Role-Based Access Control: Validate expected role against authorized account role
+        if (credentials.expectedRole) {
+          const expected = credentials.expectedRole.toUpperCase().trim();
+          const actual = user.role.toUpperCase().trim();
+
+          const isMatch =
+            expected === actual ||
+            (expected === "STUDENT" && actual === "TRAINEE") ||
+            (expected === "TRAINEE" && actual === "STUDENT") ||
+            (expected === "PROVIDER" && actual === "TRAINING_PROVIDER") ||
+            (expected === "GOVERNMENT" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR")) ||
+            (expected === "ADMIN" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR")) ||
+            (expected === "ADMINISTRATOR" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR"));
+
+          if (!isMatch) {
+            throw new Error(
+              `Access Denied: This account (${user.email}) is registered as a ${actual.replace(/_/g, " ")}, and is not authorized to access the ${expected.replace(/_/g, " ")} portal.`
+            );
+          }
+        }
+
+        // Normalize STUDENT → TRAINEE for backward-compat legacy accounts
+        if (user.role === "STUDENT") {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role: "TRAINEE" },
+          });
+          user = { ...user, role: "TRAINEE" } as typeof user;
         }
 
         return {
@@ -121,7 +155,7 @@ export async function getCurrentUser() {
     email: string;
     name?: string;
     image?: string;
-    role: "TRAINEE" | "EMPLOYER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN";
+    role: "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER" | "ADMINISTRATOR";
     adminApproved: boolean;
   } | null;
 }

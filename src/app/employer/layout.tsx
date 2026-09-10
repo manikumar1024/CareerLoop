@@ -1,7 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import Navbar from "@/components/Navbar";
+import RoleHeader from "@/components/RoleHeader";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import Footer from "@/components/Footer";
 
@@ -13,12 +13,29 @@ export default async function EmployerLayout({
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/signin?role=EMPLOYER&callbackUrl=/employer");
+    redirect("/login/employer");
+  }
+
+  // Strict role check: Employer only
+  if (user.role !== "EMPLOYER") {
+    const roleRedirects: Record<string, string> = {
+      TRAINEE: "/trainee",
+      TRAINER: "/trainer",
+      TRAINING_PROVIDER: "/provider",
+      GOVERNMENT_ADMIN: "/admin",
+      ADMINISTRATOR: "/admin",
+    };
+    redirect(roleRedirects[user.role] || "/login/employer");
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
+      <RoleHeader
+        portalName="Employer Hiring Portal"
+        roleBadge="Verified Employer"
+        userName={user.name}
+        userEmail={user.email}
+      />
       <div className="flex-1 max-w-7xl mx-auto w-full flex flex-col lg:flex-row">
         <DashboardSidebar
           role="EMPLOYER"

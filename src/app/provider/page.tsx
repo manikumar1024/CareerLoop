@@ -27,6 +27,7 @@ export default async function ProviderDashboardPage() {
   const provider = await prisma.trainingProviderProfile.findUnique({
     where: { userId: user.id },
     include: {
+      trainers: { select: { id: true, status: true } },
       programs: {
         include: {
           enrollments: {
@@ -61,6 +62,7 @@ export default async function ProviderDashboardPage() {
   const allEnrollments = provider.programs.flatMap((p) => p.enrollments);
   const totalEnrolled = allEnrollments.length;
   const totalCertified = provider.programs.reduce((acc, p) => acc + p.certifications.length, 0);
+  const activeTrainers = provider.trainers.filter((t) => t.status === "ACTIVE").length;
 
   const placedTrainees = allEnrollments.filter(
     (e) =>
@@ -103,12 +105,19 @@ export default async function ProviderDashboardPage() {
       </div>
 
       {/* KPI Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <MetricCard
           title="Active Programs"
           value={provider.programs.length}
           subtitle="Accredited courses"
           icon={BookOpen}
+        />
+
+        <MetricCard
+          title="Active Trainers"
+          value={activeTrainers}
+          subtitle="Registered instructors"
+          icon={Award}
         />
 
         <MetricCard

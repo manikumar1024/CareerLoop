@@ -21,8 +21,10 @@ async function main() {
   await prisma.certification.deleteMany();
   await prisma.assessment.deleteMany();
   await prisma.enrollment.deleteMany();
+  await prisma.batch.deleteMany();
   await prisma.course.deleteMany();
   await prisma.trainingProgram.deleteMany();
+  await prisma.trainerProfile.deleteMany();
   await prisma.trainingProviderProfile.deleteMany();
   await prisma.employerProfile.deleteMany();
   await prisma.traineeProfile.deleteMany();
@@ -155,6 +157,44 @@ async function main() {
       description: "Industrial training on CAD blueprints, G-code authoring, and multi-axis CNC lathe calibration.",
       durationWeeks: 14,
       minHours: 420,
+    },
+  });
+
+  // 4b. Create Trainer Accounts & Batches
+  const trainerUser = await prisma.user.create({
+    data: {
+      email: "trainer@puneskillhub.org",
+      name: "Ramesh Kulkarni",
+      passwordHash: defaultPassword,
+      role: "TRAINER",
+      adminApproved: true,
+      consentGiven: true,
+    },
+  });
+
+  const trainerProfile = await prisma.trainerProfile.create({
+    data: {
+      userId: trainerUser.id,
+      providerId: providerProfiles[0].id,
+      name: "Ramesh Kulkarni",
+      email: "trainer@puneskillhub.org",
+      phone: "+91 98765 43210",
+      specialization: "Full Stack Web & Cloud Architecture",
+      bio: "10+ years experience mentoring vocational batches in frontend and backend technologies.",
+      status: "ACTIVE",
+    },
+  });
+
+  const batchFullStackA = await prisma.batch.create({
+    data: {
+      programId: progFullStack.id,
+      trainerId: trainerProfile.id,
+      name: "Full Stack Cohort 2026-Alpha",
+      batchCode: "BCH-FS-01",
+      startDate: new Date("2026-01-15"),
+      endDate: new Date("2026-05-15"),
+      status: "ACTIVE",
+      maxCapacity: 30,
     },
   });
 
@@ -344,9 +384,13 @@ async function main() {
         district: t.district,
         educationLevel: "Diploma / Higher Secondary",
         currentStatus: t.status,
-        targetRole: t.program.title.replace(" Certificate", "").replace(" Program", ""),
-        targetSalaryMin: 22000,
-        targetSalaryMax: 40000,
+        careerTarget: {
+          create: {
+            targetRole: t.program.title.replace(" Certificate", "").replace(" Program", ""),
+            targetSalaryMin: 22000,
+            targetSalaryMax: 40000,
+          },
+        },
       },
     });
 
@@ -369,6 +413,7 @@ async function main() {
       data: {
         traineeId: traineeProfile.id,
         programId: t.program.id,
+        batchId: t.program.id === progFullStack.id ? batchFullStackA.id : null,
         attendancePercentage: t.attendance,
         status: "COMPLETED",
         grade: t.score >= 85 ? "A+" : "A",
@@ -395,7 +440,8 @@ async function main() {
           programId: t.program.id,
           certificateNumber: `NSDC-${t.program.code}-${counter}`,
           issuingAuthority: "National Skill Development Board",
-          verified: true,
+          verificationStatus: "VERIFIED",
+          verifiedAt: new Date(),
         },
       });
     }

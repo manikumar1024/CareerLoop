@@ -15,6 +15,7 @@ import {
   TrendingUp, AlertCircle, PlusCircle, CheckCircle2, Target, BookOpen,
   BarChart3, Map
 } from "lucide-react";
+import TraineeAchievements from "@/components/trainee/TraineeAchievements";
 
 export const revalidate = 0;
 
@@ -409,6 +410,20 @@ export default async function TraineeDashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Gamified Achievements & Milestones */}
+      <TraineeAchievements
+        skillsCount={trainee.skills.length}
+        hasTarget={!!trainee.careerTarget}
+        hasProjects={trainee.projects.length > 0}
+        completedFollowUpsCount={trainee.followUps.filter((f) => f.isCompleted).length}
+        verifiedCertificationsCount={trainee.certifications.filter(
+          (c) => c.verificationStatus === "VERIFIED" || c.verificationStatus === "PROVIDER_VERIFIED"
+        ).length}
+        hasVerifiedEmployment={trainee.employmentRecords.some(
+          (e) => e.verificationStatus === "EMPLOYER_VERIFIED"
+        )}
+      />
 
       {/* Middle grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

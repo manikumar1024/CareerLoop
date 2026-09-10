@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import EmptyState from "@/components/EmptyState";
 import SkillBadge from "@/components/SkillBadge";
 import { formatDate } from "@/lib/utils";
-import { Users, ShieldCheck, Award, Briefcase, MapPin } from "lucide-react";
+import { Users, ShieldCheck, Award, Briefcase, MapPin, Sparkles, AlertCircle, TrendingUp } from "lucide-react";
+import { calculateCandidateFit } from "@/lib/matching-service";
 
 export const revalidate = 0;
 
@@ -14,6 +15,13 @@ export default async function EmployerCandidatesPage() {
 
   const employer = await prisma.employerProfile.findUnique({
     where: { userId: user.id },
+    include: {
+      jobs: {
+        where: { status: "OPEN" },
+        include: { skillRequirements: { include: { skill: true } } },
+        take: 1,
+      },
+    },
   });
 
   if (!employer) {
@@ -26,6 +34,8 @@ export default async function EmployerCandidatesPage() {
       />
     );
   }
+
+  const primaryJob = employer.jobs[0] || null;
 
   // Fetch candidates who are certified or employed with at least 1 verified skill
   const candidates = await prisma.traineeProfile.findMany({
@@ -87,6 +97,32 @@ export default async function EmployerCandidatesPage() {
               c => c.verificationStatus === "VERIFIED" || c.verificationStatus === "PROVIDER_VERIFIED"
             ).length;
 
+            let fitResult = null;
+            if (primaryJob && primaryJob.skillRequirements.length > 0) {
+              fitResult = calculateCandidateFit(
+                {
+                  skills: candidate.skills.map((s) => ({
+                    name: s.skill.name,
+                    proficiencyLevel: s.proficiencyLevel,
+                    verified: s.verifiedByAssessment || s.verifiedByEmployer,
+                  })),
+                  locationDistrict: candidate.district,
+                  targetSalary: candidate.careerTarget?.targetSalaryMin || undefined,
+                },
+                {
+                  title: primaryJob.title,
+                  locationDistrict: primaryJob.locationDistrict,
+                  salaryMin: primaryJob.salaryMin,
+                  salaryMax: primaryJob.salaryMax,
+                  requiredSkills: primaryJob.skillRequirements.map((r) => ({
+                    name: r.skill.name,
+                    required: r.required,
+                    minLevel: r.minLevel,
+                  })),
+                }
+              );
+            }
+
             return (
               <div key={candidate.id} className="bg-white rounded-3xl p-6 border border-border shadow-card">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -96,9 +132,23 @@ export default async function EmployerCandidatesPage() {
                         {candidate.user.name?.charAt(0)?.toUpperCase() || "T"}
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-base text-charcoal-800">
-                          {candidate.user.name || "Candidate"}
-                        </h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-display font-bold text-base text-charcoal-800">
+                            {candidate.user.name || "Candidate"}
+                          </h4>
+                          {fitResult && (
+                            <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                              fitResult.overallScore >= 75
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                : fitResult.overallScore >= 50
+                                ? "bg-blue-50 text-blue-800 border-blue-200"
+                                : "bg-amber-50 text-amber-800 border-amber-200"
+                            }`}>
+                              <Sparkles className="w-3 h-3" />
+                              {fitResult.overallScore}% Fit ({primaryJob?.title})
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 text-xs text-muted">
                           <MapPin className="w-3 h-3" />
                           <span>{candidate.district}</span>
@@ -115,6 +165,19 @@ export default async function EmployerCandidatesPage() {
                       }`}>
                         {candidate.currentStatus.replace(/_/g, " ")}
                       </span>
+
+                      {fitResult && (
+                        <span className={`flex items-center gap-1 font-semibold ${
+                          fitResult.retentionRisk.riskLevel === "LOW"
+                            ? "text-emerald-700"
+                            : fitResult.retentionRisk.riskLevel === "MEDIUM"
+                            ? "text-amber-700"
+                            : "text-red-700"
+                        }`}>
+                          <TrendingUp className="w-3 h-3" />
+                          {fitResult.retentionRisk.retentionProbabilityPct}% Retention Probability ({fitResult.retentionRisk.riskLevel} Risk)
+                        </span>
+                      )}
 
                       {verifiedSkillCount > 0 && (
                         <span className="flex items-center gap-1 text-emerald-700 font-semibold">
