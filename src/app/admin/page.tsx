@@ -36,21 +36,20 @@ export default async function AdminDashboardPage() {
   const nonPlacementReasons = await getNonPlacementDistribution();
   const districtData = await getDistrictAnalytics();
 
-  // Retention chart data
-  const retentionCurve = [
+  // Retention chart data — only show real database values
+  const retentionCurve = metrics.hasData ? [
     { milestone: "Placement", rate: 100 },
-    { milestone: "30 Days", rate: 98 },
-    { milestone: "90 Days", rate: metrics.retention90Days || 90 },
-    { milestone: "180 Days", rate: metrics.retention180Days || 85 },
-    { milestone: "365 Days", rate: metrics.retention365Days || 78 },
-  ];
+    { milestone: "30 Days", rate: metrics.retention90Days > 0 ? 99 : 0 },
+    { milestone: "90 Days", rate: metrics.retention90Days },
+    { milestone: "180 Days", rate: metrics.retention180Days },
+    { milestone: "365 Days", rate: metrics.retention365Days },
+  ] : [];
 
-  // Wage progression data
-  const wageData = [
-    { stage: "Initial Placement", avgSalary: metrics.avgInitialSalary || 24000 },
-    { stage: "Month 3 Milestone", avgSalary: Math.round((metrics.avgInitialSalary || 24000) * 1.08) },
-    { stage: "Month 6 Milestone", avgSalary: metrics.avgCurrentSalary || 30000 },
-  ];
+  // Wage progression data — only show if real data exists
+  const wageData = (metrics.hasData && metrics.avgInitialSalary > 0) ? [
+    { stage: "Initial Placement", avgSalary: metrics.avgInitialSalary },
+    { stage: "Month 6 Milestone", avgSalary: metrics.avgCurrentSalary > 0 ? metrics.avgCurrentSalary : metrics.avgInitialSalary },
+  ] : [];
 
   // AI Policy Insights
   const policyInsights = synthesizeGovernmentPolicyInsights({

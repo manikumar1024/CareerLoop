@@ -42,9 +42,6 @@ export default async function TraineeProfilePage() {
     const educationLevel = formData.get("educationLevel") as string;
     const phone = formData.get("phone") as string;
     const bio = formData.get("bio") as string;
-    const targetRole = formData.get("targetRole") as string;
-    const targetSalaryMin = parseInt(formData.get("targetSalaryMin") as string) || null;
-    const targetSalaryMax = parseInt(formData.get("targetSalaryMax") as string) || null;
     const currentStatus = formData.get("currentStatus") as string;
 
     const updated = await prisma.traineeProfile.update({
@@ -54,9 +51,6 @@ export default async function TraineeProfilePage() {
         educationLevel,
         phone,
         bio,
-        targetRole,
-        targetSalaryMin,
-        targetSalaryMax,
         currentStatus,
       },
     });
@@ -179,40 +173,11 @@ export default async function TraineeProfilePage() {
 
             <div>
               <label className="block font-semibold text-charcoal-700 mb-1">
-                Target Job Role
+                Career Target
               </label>
-              <input
-                type="text"
-                name="targetRole"
-                defaultValue={trainee.targetRole || ""}
-                placeholder="e.g. Full Stack Developer, Solar Technician"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block font-semibold text-charcoal-700 mb-1">
-                  Target Salary (Min ₹/mo)
-                </label>
-                <input
-                  type="number"
-                  name="targetSalaryMin"
-                  defaultValue={trainee.targetSalaryMin || 20000}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-charcoal-700 mb-1">
-                  Target Salary (Max ₹/mo)
-                </label>
-                <input
-                  type="number"
-                  name="targetSalaryMax"
-                  defaultValue={trainee.targetSalaryMax || 35000}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white"
-                />
-              </div>
+              <p className="text-xs text-muted p-3 rounded-xl bg-sage-50 border border-sage-200">
+                Career target (role, salary, location) is now managed separately. <a href="/trainee/career-target" className="text-emerald-800 font-semibold underline">Edit Career Target →</a>
+              </p>
             </div>
 
           </div>

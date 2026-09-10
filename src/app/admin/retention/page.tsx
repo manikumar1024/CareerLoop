@@ -17,18 +17,16 @@ export default async function AdminRetentionPage() {
   const metrics = await getLongitudinalOverview();
 
   const retentionCurve = [
-    { milestone: "Placement (Day 0)", rate: 100 },
-    { milestone: "30-Day Check-in", rate: 98 },
-    { milestone: "90-Day Milestone", rate: metrics.retention90Days || 90 },
-    { milestone: "180-Day Milestone", rate: metrics.retention180Days || 85 },
-    { milestone: "365-Day Milestone", rate: metrics.retention365Days || 78 },
-  ];
+    { milestone: "30-Day Milestone", rate: metrics.retention90Days },
+    { milestone: "90-Day Milestone", rate: metrics.retention90Days },
+    { milestone: "180-Day Milestone", rate: metrics.retention180Days },
+    { milestone: "365-Day Milestone", rate: metrics.retention365Days },
+  ].filter((d) => d.rate != null && d.rate > 0);
 
-  const wageData = [
-    { stage: "Initial Starting Salary", avgSalary: metrics.avgInitialSalary || 24000 },
-    { stage: "Month 3 Check-in", avgSalary: Math.round((metrics.avgInitialSalary || 24000) * 1.08) },
-    { stage: "Month 6 Check-in", avgSalary: metrics.avgCurrentSalary || 30000 },
-  ];
+  const wageData = metrics.avgInitialSalary > 0 ? [
+    { stage: "Initial Salary", avgSalary: metrics.avgInitialSalary },
+    { stage: "Current Avg Salary", avgSalary: metrics.avgCurrentSalary },
+  ] : [];
 
   return (
     <div className="space-y-8 max-w-6xl">

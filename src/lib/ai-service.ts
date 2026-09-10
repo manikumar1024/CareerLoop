@@ -162,12 +162,12 @@ Respond in STRICT JSON format with this exact structure:
 
 export function evaluateEmployabilityRisk({
   traineeId,
-  attendancePercentage = 95,
-  assessmentScore = 80,
-  skillsCount = 4,
+  attendancePercentage,
+  assessmentScore,
+  skillsCount = 0,
   isEmployed = false,
-  followUpResponsesCount = 1,
-  hasCertifiedCredentials = true,
+  followUpResponsesCount = 0,
+  hasCertifiedCredentials = false,
 }: {
   traineeId: string;
   attendancePercentage?: number;
@@ -180,50 +180,54 @@ export function evaluateEmployabilityRisk({
   let score = 50; // base
   const factors: EmployabilityRiskReport["primaryFactors"] = [];
 
-  // 1. Assessment Score
-  if (assessmentScore >= 80) {
-    score += 20;
-    factors.push({
-      factor: "High Assessment Mastery",
-      impact: "POSITIVE",
-      weight: 20,
-      explanation: `Scored ${assessmentScore}% in standardized practical assessments.`,
-    });
-  } else if (assessmentScore < 60) {
-    score -= 20;
-    factors.push({
-      factor: "Low Assessment Score",
-      impact: "NEGATIVE",
-      weight: -20,
-      explanation: `Scored ${assessmentScore}%, indicating foundational competency gaps.`,
-    });
-  } else {
-    score += 10;
-    factors.push({
-      factor: "Satisfactory Assessment Score",
-      impact: "NEUTRAL",
-      weight: 10,
-      explanation: `Scored ${assessmentScore}%, meeting baseline threshold.`,
-    });
+  // 1. Assessment Score — only factor in if real data exists
+  if (assessmentScore !== undefined) {
+    if (assessmentScore >= 80) {
+      score += 20;
+      factors.push({
+        factor: "High Assessment Mastery",
+        impact: "POSITIVE",
+        weight: 20,
+        explanation: `Scored ${assessmentScore}% in standardized practical assessments.`,
+      });
+    } else if (assessmentScore < 60) {
+      score -= 20;
+      factors.push({
+        factor: "Low Assessment Score",
+        impact: "NEGATIVE",
+        weight: -20,
+        explanation: `Scored ${assessmentScore}%, indicating foundational competency gaps.`,
+      });
+    } else {
+      score += 10;
+      factors.push({
+        factor: "Satisfactory Assessment Score",
+        impact: "NEUTRAL",
+        weight: 10,
+        explanation: `Scored ${assessmentScore}%, meeting baseline threshold.`,
+      });
+    }
   }
 
-  // 2. Attendance
-  if (attendancePercentage >= 90) {
-    score += 15;
-    factors.push({
-      factor: "Consistent Attendance",
-      impact: "POSITIVE",
-      weight: 15,
-      explanation: `${attendancePercentage}% training attendance shows high engagement.`,
-    });
-  } else if (attendancePercentage < 75) {
-    score -= 15;
-    factors.push({
-      factor: "Low Training Attendance",
-      impact: "NEGATIVE",
-      weight: -15,
-      explanation: `Attendance of ${attendancePercentage}% is below the 80% threshold required for placement readiness.`,
-    });
+  // 2. Attendance — only factor in if real data exists
+  if (attendancePercentage !== undefined) {
+    if (attendancePercentage >= 90) {
+      score += 15;
+      factors.push({
+        factor: "Consistent Attendance",
+        impact: "POSITIVE",
+        weight: 15,
+        explanation: `${attendancePercentage}% training attendance shows high engagement.`,
+      });
+    } else if (attendancePercentage < 75) {
+      score -= 15;
+      factors.push({
+        factor: "Low Training Attendance",
+        impact: "NEGATIVE",
+        weight: -15,
+        explanation: `Attendance of ${attendancePercentage}% is below the 80% threshold required for placement readiness.`,
+      });
+    }
   }
 
   // 3. Certified Credentials

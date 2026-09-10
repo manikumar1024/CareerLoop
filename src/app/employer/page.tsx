@@ -64,9 +64,10 @@ export default async function EmployerDashboardPage() {
       ? Math.round(verifiedList.reduce((acc, curr) => acc + curr.monthlySalary, 0) / verifiedList.length)
       : 0;
 
+  const verifiedWithScore = verifiedList.filter(e => e.skillRelevanceScore !== null);
   const avgSkillScore =
-    verifiedList.length > 0
-      ? Math.round((verifiedList.reduce((acc, curr) => acc + curr.skillRelevanceScore, 0) / verifiedList.length) * 10) / 10
+    verifiedWithScore.length > 0
+      ? Math.round((verifiedWithScore.reduce((acc, curr) => acc + (curr.skillRelevanceScore ?? 0), 0) / verifiedWithScore.length) * 10) / 10
       : 0;
 
   async function verifyEmploymentAction(formData: FormData) {

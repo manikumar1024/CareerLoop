@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { generateTraineeId } from "@/lib/utils";
 import { logAuditAction } from "@/lib/audit";
+import { seedCareerData } from "@/lib/seed-career-data";
 
 export async function POST(req: Request) {
   try {
@@ -11,14 +12,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { role, district, orgName, adminCode } = await req.json();
+    const body = await req.json();
+    const { role, district, orgName, adminCode } = body;
 
     if (!role) {
       return NextResponse.json({ error: "Role is required." }, { status: 400 });
     }
 
-    if (role === "GOVERNMENT_ADMIN" && adminCode !== (process.env.ADMIN_REGISTRATION_CODE || "CAREERLOOP-GOV-ADMIN")) {
-      return NextResponse.json({ error: "Invalid Admin Authorization Code." }, { status: 403 });
+    if (
+      role === "GOVERNMENT_ADMIN" &&
+      adminCode !== process.env.ADMIN_REGISTRATION_CODE
+    ) {
+      return NextResponse.json(
+        { error: "Invalid Admin Authorization Code." },
+        { status: 403 }
+      );
     }
 
     // Update user role
@@ -32,7 +40,9 @@ export async function POST(req: Request) {
 
     // Create role profile if not existing
     if (role === "TRAINEE") {
-      const existing = await prisma.traineeProfile.findUnique({ where: { userId: user.id } });
+      const existing = await prisma.traineeProfile.findUnique({
+        where: { userId: user.id },
+      });
       if (!existing) {
         await prisma.traineeProfile.create({
           data: {
@@ -43,8 +53,13 @@ export async function POST(req: Request) {
           },
         });
       }
+
+      // Ensure career data is seeded (idempotent)
+      await seedCareerData();
     } else if (role === "EMPLOYER") {
-      const existing = await prisma.employerProfile.findUnique({ where: { userId: user.id } });
+      const existing = await prisma.employerProfile.findUnique({
+        where: { userId: user.id },
+      });
       if (!existing) {
         await prisma.employerProfile.create({
           data: {
@@ -57,7 +72,9 @@ export async function POST(req: Request) {
         });
       }
     } else if (role === "TRAINING_PROVIDER") {
-      const existing = await prisma.trainingProviderProfile.findUnique({ where: { userId: user.id } });
+      const existing = await prisma.trainingProviderProfile.findUnique({
+        where: { userId: user.id },
+      });
       if (!existing) {
         await prisma.trainingProviderProfile.create({
           data: {
@@ -82,6 +99,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, role });
   } catch (err: any) {
     console.error("Onboarding error:", err);
-    return NextResponse.json({ error: err.message || "Failed to complete onboarding" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Failed to complete onboarding" },
+      { status: 500 }
+    );
   }
 }

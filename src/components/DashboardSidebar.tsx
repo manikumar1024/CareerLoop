@@ -3,27 +3,31 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  User, 
-  GraduationCap, 
-  Award, 
-  Briefcase, 
-  Clock, 
-  Sparkles, 
-  Settings, 
-  Building2, 
-  CheckSquare, 
-  Users, 
-  BarChart3, 
-  BookOpen, 
-  MapPin, 
-  PieChart, 
-  Shield, 
+import {
+  Home,
+  User,
+  GraduationCap,
+  Award,
+  Briefcase,
+  Clock,
+  Sparkles,
+  Settings,
+  Building2,
+  CheckSquare,
+  Users,
+  BarChart3,
+  BookOpen,
+  MapPin,
+  PieChart,
+  Shield,
   FileSpreadsheet,
-  Layers,
+  Target,
+  MessageSquare,
+  ClipboardList,
   ArrowLeft,
-  ChevronRight
+  Layers,
+  BriefcaseIcon,
+  ScrollText
 } from "lucide-react";
 
 interface SidebarItem {
@@ -31,6 +35,7 @@ interface SidebarItem {
   href: string;
   icon: any;
   badge?: string;
+  section?: string;
 }
 
 interface DashboardSidebarProps {
@@ -46,13 +51,19 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
     switch (role) {
       case "TRAINEE":
         return [
-          { label: "Overview", href: "/trainee", icon: Home },
-          { label: "My Profile", href: "/trainee/profile", icon: User },
-          { label: "My Skills", href: "/trainee/skills", icon: Award },
-          { label: "Training & Certs", href: "/trainee/training", icon: GraduationCap },
-          { label: "Employment Journey", href: "/trainee/outcomes", icon: Briefcase },
+          { label: "Dashboard", href: "/trainee", icon: Home },
+          { label: "My Career", href: "/trainee/career-target", icon: Target },
+          { label: "Skills", href: "/trainee/skills", icon: Award },
+          { label: "Roadmap", href: "/trainee/roadmap", icon: BookOpen },
+          { label: "Career Identity", href: "/trainee/identity", icon: User },
+          { label: "Training", href: "/trainee/training", icon: GraduationCap },
+          { label: "Certifications", href: "/trainee/certifications", icon: Award },
+          { label: "Jobs", href: "/trainee/jobs", icon: Briefcase },
+          { label: "Applications", href: "/trainee/applications", icon: ClipboardList },
+          { label: "Employment", href: "/trainee/outcomes", icon: BriefcaseIcon },
+          { label: "AI Career Coach", href: "/trainee/coach", icon: Sparkles },
+          { label: "Career Timeline", href: "/trainee/timeline", icon: ScrollText },
           { label: "Follow-ups", href: "/trainee/followups", icon: Clock },
-          { label: "AI Recommendations", href: "/trainee/recommendations", icon: Sparkles },
           { label: "Settings & Consent", href: "/trainee/settings", icon: Settings },
         ];
 
@@ -60,7 +71,10 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
         return [
           { label: "Dashboard", href: "/employer", icon: Home },
           { label: "Company Profile", href: "/employer/profile", icon: Building2 },
-          { label: "Verifications", href: "/employer/verifications", icon: CheckSquare },
+          { label: "Jobs", href: "/employer/jobs", icon: Briefcase },
+          { label: "Candidates", href: "/employer/candidates", icon: Users },
+          { label: "Applications", href: "/employer/applications", icon: ClipboardList },
+          { label: "Verification Queue", href: "/employer/verifications", icon: CheckSquare },
           { label: "Verified Employees", href: "/employer/employees", icon: Users },
           { label: "Retention Analytics", href: "/employer/analytics", icon: BarChart3 },
         ];
@@ -76,14 +90,14 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
       case "GOVERNMENT_ADMIN":
         return [
           { label: "Executive Overview", href: "/admin", icon: Home },
-          { label: "Trainee Outcomes", href: "/admin/outcomes", icon: Briefcase },
+          { label: "Outcome Intelligence", href: "/admin/outcomes", icon: Briefcase },
           { label: "District Intelligence", href: "/admin/districts", icon: MapPin },
           { label: "Course Performance", href: "/admin/courses", icon: BookOpen },
           { label: "Provider Scorecard", href: "/admin/providers", icon: Building2 },
-          { label: "Skill Gap Demand", href: "/admin/skills", icon: Sparkles },
+          { label: "Skill Demand", href: "/admin/skills", icon: Sparkles },
           { label: "Retention & Wages", href: "/admin/retention", icon: PieChart },
-          { label: "Policy Interventions", href: "/admin/reports", icon: FileSpreadsheet },
-          { label: "Audit & Consent Logs", href: "/admin/audit", icon: Shield },
+          { label: "Interventions", href: "/admin/reports", icon: FileSpreadsheet },
+          { label: "Audit & Consent", href: "/admin/audit", icon: Shield },
         ];
 
       default:

@@ -13,19 +13,21 @@ export default function StatusBadge({ status, size = "sm" }: StatusBadgeProps) {
   let Icon = Clock;
   let label = status?.replace(/_/g, " ");
 
-  if (normalized === "EMPLOYER_VERIFIED" || normalized === "VERIFIED" || normalized === "COMPLETED") {
+  if (normalized === "EMPLOYER_VERIFIED" || normalized === "VERIFIED" || normalized === "COMPLETED" || normalized === "PROVIDER_VERIFIED") {
     bg = "bg-emerald-50 text-emerald-800 border-emerald-200";
     Icon = ShieldCheck;
-    label = normalized === "EMPLOYER_VERIFIED" ? "Employer Verified" : label;
+    if (normalized === "EMPLOYER_VERIFIED") label = "Employer Verified";
+    else if (normalized === "PROVIDER_VERIFIED") label = "Provider Verified";
   } else if (normalized === "SELF_REPORTED") {
     bg = "bg-blue-50 text-blue-800 border-blue-200";
     Icon = CheckCircle2;
     label = "Self-Reported";
-  } else if (normalized === "PENDING_VERIFICATION" || normalized === "IN_PROGRESS") {
+  } else if (normalized === "PENDING_VERIFICATION" || normalized === "IN_PROGRESS" || normalized === "UPLOADED") {
     bg = "bg-amber-50 text-amber-800 border-amber-200";
     Icon = Clock;
-    label = normalized === "PENDING_VERIFICATION" ? "Pending Verification" : "In Progress";
-  } else if (normalized === "REJECTED" || normalized === "DROPPED" || normalized === "FAILED") {
+    if (normalized === "PENDING_VERIFICATION") label = "Pending Verification";
+    else if (normalized === "UPLOADED") label = "Uploaded";
+  } else if (normalized === "REJECTED" || normalized === "DROPPED" || normalized === "FAILED" || normalized === "EXPIRED") {
     bg = "bg-red-50 text-red-700 border-red-200";
     Icon = XCircle;
   } else if (normalized === "EMPLOYED") {

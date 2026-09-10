@@ -8,19 +8,12 @@ import SkillBadge from "@/components/SkillBadge";
 import Timeline, { TimelineEvent } from "@/components/Timeline";
 import EmptyState from "@/components/EmptyState";
 import { evaluateEmployabilityRisk } from "@/lib/ai-service";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { computeSkillGap, calculateCareerReadiness } from "@/lib/career-engine";
+import { formatCurrency } from "@/lib/utils";
 import { 
-  GraduationCap, 
-  Award, 
-  Briefcase, 
-  Clock, 
-  Sparkles, 
-  ShieldCheck, 
-  ArrowRight,
-  TrendingUp,
-  AlertCircle,
-  PlusCircle,
-  CheckCircle2
+  GraduationCap, Award, Briefcase, Clock, Sparkles, ArrowRight,
+  TrendingUp, AlertCircle, PlusCircle, CheckCircle2, Target, BookOpen,
+  BarChart3, Map
 } from "lucide-react";
 
 export const revalidate = 0;
@@ -39,33 +32,101 @@ export default async function TraineeDashboardPage() {
       selfEmployments: true,
       apprenticeships: true,
       followUps: true,
+      careerTarget: true,
+      projects: true,
+      skillEvidence: true,
+      roadmap: {
+        include: {
+          items: { orderBy: [{ phase: "asc" }, { orderIndex: "asc" }] },
+        },
+      },
     },
   });
 
   if (!trainee) {
     return (
       <EmptyState
-        title="Trainee Profile Not Initialized"
-        description="Please complete your profile details to activate your digital trainee identifier and career tracking."
-        actionText="Setup Trainee Profile"
+        title="Profile Not Initialized"
+        description="Your trainee profile hasn't been set up yet."
+        actionText="Complete Onboarding"
         actionHref="/onboarding"
       />
     );
   }
 
-  // Calculate real AI employability risk score
+  // ── Career Readiness from real data ──────────────────────────────────────
+  let readiness = null;
+  let skillGap: ReturnType<typeof computeSkillGap> = [];
+  let careerPath = null;
+
+  if (trainee.careerTarget) {
+    const cp = await prisma.careerPath.findFirst({
+      where: { title: { contains: trainee.careerTarget.targetRole } },
+      include: { requirements: { include: { skill: true } } },
+    });
+
+    if (cp) {
+      careerPath = cp;
+      const requirements = cp.requirements.map((r) => ({
+        skillId: r.skillId,
+        skillName: r.skill.name,
+        category: r.skill.category,
+        importance: r.importance,
+        minLevel: r.minLevel,
+      }));
+      const userSkills = trainee.skills.map((s) => ({
+        skillId: s.skillId,
+        proficiencyLevel: s.proficiencyLevel,
+      }));
+      skillGap = computeSkillGap(requirements, userSkills);
+
+      const totalRequired = skillGap.filter((g) => g.importance === "REQUIRED").length;
+      const strongSkills = skillGap.filter((g) => g.status === "STRONG" && g.importance === "REQUIRED").length;
+      const developingSkills = skillGap.filter((g) => g.status === "DEVELOPING" && g.importance === "REQUIRED").length;
+      const missingRequired = skillGap.filter((g) => g.status === "MISSING" && g.importance === "REQUIRED").length;
+
+      readiness = calculateCareerReadiness({
+        totalRequiredSkills: totalRequired,
+        strongSkills,
+        developingSkills,
+        missingRequiredSkills: missingRequired,
+        projectCount: trainee.projects.length,
+        certificationCount: trainee.certifications.length,
+        verifiedCertifications: trainee.certifications.filter(
+          (c) => c.verificationStatus === "VERIFIED" || c.verificationStatus === "PROVIDER_VERIFIED"
+        ).length,
+        employmentRecordCount: trainee.employmentRecords.length,
+        evidenceCount: trainee.skillEvidence.length,
+        hasCareerTarget: true,
+      });
+    }
+  }
+
+  // ── AI employability risk (only when we have real data) ──────────────────
   const activeEnrollment = trainee.enrollments[0];
   const assessment = activeEnrollment?.assessments[0];
   const riskReport = evaluateEmployabilityRisk({
     traineeId: trainee.traineeId,
-    attendancePercentage: activeEnrollment?.attendancePercentage || 95,
-    assessmentScore: assessment?.scoreObtained || 80,
+    attendancePercentage: activeEnrollment?.attendancePercentage ?? undefined,
+    assessmentScore: assessment?.scoreObtained ?? undefined,
     skillsCount: trainee.skills.length,
     isEmployed: trainee.employmentRecords.length > 0 || trainee.selfEmployments.length > 0,
-    hasCertifiedCredentials: trainee.certifications.length > 0,
+    hasCertifiedCredentials: trainee.certifications.some(
+      (c: any) => c.verificationStatus === "VERIFIED" || c.verificationStatus === "PROVIDER_VERIFIED"
+    ),
   });
 
-  // Build real longitudinal timeline events
+  // ── Roadmap progress ─────────────────────────────────────────────────────
+  const roadmapTotal = trainee.roadmap?.items.length ?? 0;
+  const roadmapCompleted = trainee.roadmap?.items.filter((i) => i.status === "COMPLETED").length ?? 0;
+  const nextRoadmapItem = trainee.roadmap?.items.find((i) => i.status !== "COMPLETED");
+
+  // ── Top missing skills (for dashboard) ──────────────────────────────────
+  const missingRequiredSkills = skillGap
+    .filter((g) => g.status === "MISSING" && g.importance === "REQUIRED")
+    .slice(0, 3);
+
+  // ── Timeline events from real data ───────────────────────────────────────
   const timelineEvents: TimelineEvent[] = [];
 
   trainee.enrollments.forEach((e) => {
@@ -75,7 +136,7 @@ export default async function TraineeDashboardPage() {
       title: e.program.title,
       subtitle: `Enrolled in ${e.program.sector}`,
       date: e.enrollmentDate,
-      details: `Attendance: ${e.attendancePercentage}% · Grade: ${e.grade || "In Progress"}`,
+      details: `Grade: ${e.grade || "In Progress"}`,
       status: e.status,
     });
   });
@@ -87,8 +148,8 @@ export default async function TraineeDashboardPage() {
       title: `Certified: ${c.program.title}`,
       subtitle: `Credential: ${c.certificateNumber}`,
       date: c.issueDate,
-      details: `Issued by ${c.issuingAuthority}`,
-      isVerified: c.verified,
+      details: `${c.verificationStatus.replace(/_/g, " ")}`,
+      isVerified: c.verificationStatus === "VERIFIED" || c.verificationStatus === "PROVIDER_VERIFIED",
     });
   });
 
@@ -97,36 +158,11 @@ export default async function TraineeDashboardPage() {
       id: emp.id,
       type: "EMPLOYMENT",
       title: `${emp.jobTitle} at ${emp.companyName}`,
-      subtitle: `Location: ${emp.locationDistrict} · ${emp.employmentType.replace(/_/g, " ")}`,
+      subtitle: `${emp.locationDistrict} · ${emp.employmentType.replace(/_/g, " ")}`,
       date: emp.startDate,
       salary: emp.monthlySalary,
-      details: `Skill Relevance: ${emp.skillRelevanceScore}/5 · Status: ${emp.verificationStatus.replace(/_/g, " ")}`,
+      details: `${emp.verificationStatus.replace(/_/g, " ")}`,
       isVerified: emp.verificationStatus === "EMPLOYER_VERIFIED",
-    });
-  });
-
-  trainee.selfEmployments.forEach((s) => {
-    timelineEvents.push({
-      id: s.id,
-      type: "PLACEMENT",
-      title: `Founded ${s.businessName}`,
-      subtitle: `${s.businessType} · ${s.sector}`,
-      date: s.startDate,
-      salary: s.monthlyNetIncome,
-      details: `Active Enterprise · Hired ${s.employeesHired} employee(s)`,
-      status: s.businessStatus,
-    });
-  });
-
-  trainee.apprenticeships.forEach((a) => {
-    timelineEvents.push({
-      id: a.id,
-      type: "PLACEMENT",
-      title: `Apprentice: ${a.tradeRole}`,
-      subtitle: `Host: ${a.hostOrganization}`,
-      date: a.startDate,
-      salary: a.stipendAmount,
-      details: a.isCompleted ? "Completed Apprenticeship" : "Active Apprenticeship",
     });
   });
 
@@ -135,25 +171,62 @@ export default async function TraineeDashboardPage() {
       timelineEvents.push({
         id: f.id,
         type: "FOLLOWUP",
-        title: `${f.milestoneDays}-Day Longitudinal Outcome Follow-up`,
-        subtitle: f.isEmployed ? `Employed as ${f.jobTitle || "Active"}` : `Non-placement: ${f.nonPlacementReason || "Seeking Job"}`,
+        title: `${f.milestoneDays}-Day Follow-up`,
+        subtitle: f.isEmployed ? `Employed as ${f.jobTitle || "Active"}` : `Non-placement`,
         date: f.completedDate || f.createdAt,
         salary: f.currentSalary || undefined,
-        details: f.feedback || (f.wageIncreasePercent ? `Received +${f.wageIncreasePercent}% wage increment` : undefined),
+        details: f.wageIncreasePercent ? `+${f.wageIncreasePercent}% wage growth` : undefined,
       });
     }
   });
 
-  // Sort events chronologically (newest first)
   timelineEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  // Pending follow-ups
   const pendingFollowups = trainee.followUps.filter((f) => !f.isCompleted);
+
+  // ── Next Best Action ──────────────────────────────────────────────────────
+  let nextAction: { text: string; href: string; why?: string } | null = null;
+  if (!trainee.careerTarget) {
+    nextAction = {
+      text: "Set your Career Goal to unlock skill gap analysis and your personalized roadmap.",
+      href: "/trainee/career-target",
+      why: "CareerLoop needs a target to calculate what you're missing.",
+    };
+  } else if (trainee.skills.length === 0) {
+    nextAction = {
+      text: "Add your current skills to begin career matching.",
+      href: "/trainee/skills",
+      why: "Skills are the foundation of your career readiness score.",
+    };
+  } else if (!trainee.roadmap) {
+    nextAction = {
+      text: "Generate your personalized learning roadmap.",
+      href: "/trainee/roadmap/generate-redirect",
+      why: "Your roadmap shows exactly what to learn next for your target role.",
+    };
+  } else if (nextRoadmapItem) {
+    nextAction = {
+      text: nextRoadmapItem.title,
+      href: "/trainee/roadmap",
+      why: nextRoadmapItem.reasoning || "This is the highest-priority item in your roadmap.",
+    };
+  } else if (trainee.projects.length === 0) {
+    nextAction = {
+      text: "Add a project to demonstrate your skills.",
+      href: "/trainee/identity",
+      why: "Projects are the strongest evidence of practical ability.",
+    };
+  } else if (pendingFollowups.length > 0) {
+    nextAction = {
+      text: `Complete your ${pendingFollowups[0].milestoneDays}-Day follow-up milestone.`,
+      href: "/trainee/followups",
+    };
+  }
 
   return (
     <div className="space-y-8">
       
-      {/* Top Header & Identity Capsule */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -163,10 +236,10 @@ export default async function TraineeDashboardPage() {
             <StatusBadge status={trainee.currentStatus} />
           </div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-charcoal-800 tracking-tight">
-            {user.name || "Trainee Dashboard"}
+            {user.name || "Dashboard"}
           </h1>
           <p className="text-xs text-muted">
-            District: {trainee.district} · Target Role: {trainee.targetRole || "Skill Trainee"}
+            {trainee.district} · {trainee.careerTarget ? `Targeting: ${trainee.careerTarget.targetRole}` : "No career goal set yet"}
           </p>
         </div>
 
@@ -179,49 +252,43 @@ export default async function TraineeDashboardPage() {
             <span>Update Employment</span>
           </Link>
           <Link
-            href="/trainee/recommendations"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full glass-pill hover:bg-white text-charcoal-800 text-xs font-semibold border border-border transition"
+            href="/trainee/roadmap"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border hover:bg-sage-50 text-charcoal-800 text-xs font-semibold transition"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-            <span>AI Skill Gap</span>
+            <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+            <span>My Roadmap</span>
           </Link>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="Verified Skills"
-          value={trainee.skills.length}
-          subtitle="Assessed & mapped skills"
-          icon={Award}
-          badge={trainee.skills.length >= 4 ? "Broad Profile" : "Building"}
-        />
+      {/* Next Best Action Banner */}
+      {nextAction && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-xl bg-emerald-100 text-emerald-900 shrink-0">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 mb-0.5">
+                Next Best Action
+              </p>
+              <p className="text-xs font-semibold text-emerald-900">{nextAction.text}</p>
+              {nextAction.why && (
+                <p className="text-[11px] text-emerald-700 mt-0.5">{nextAction.why}</p>
+              )}
+            </div>
+          </div>
+          <Link
+            href={nextAction.href}
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold shrink-0"
+          >
+            Go
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      )}
 
-        <MetricCard
-          title="Certifications"
-          value={trainee.certifications.length}
-          subtitle="Verifiable credentials"
-          icon={GraduationCap}
-        />
-
-        <MetricCard
-          title="Milestone Follow-ups"
-          value={trainee.followUps.filter((f) => f.isCompleted).length}
-          subtitle={`${pendingFollowups.length} pending survey`}
-          icon={Clock}
-        />
-
-        <MetricCard
-          title="Employability Score"
-          value={`${riskReport.employabilityScore}/100`}
-          subtitle={`Risk Level: ${riskReport.riskLevel}`}
-          icon={Sparkles}
-          badge={riskReport.riskLevel === "LOW" ? "High Readiness" : "Action Needed"}
-        />
-      </div>
-
-      {/* Pending Follow-Up Alert Banner */}
+      {/* Pending Follow-Up Alert */}
       {pendingFollowups.length > 0 && (
         <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -229,11 +296,11 @@ export default async function TraineeDashboardPage() {
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-xs sm:text-sm text-amber-900">
-                {pendingFollowups[0].milestoneDays}-Day Career Follow-Up Milestone Due
+              <h4 className="font-bold text-xs text-amber-900">
+                {pendingFollowups[0].milestoneDays}-Day Follow-Up Due
               </h4>
               <p className="text-[11px] text-amber-800">
-                Please complete your quick check-in to record your current employment and wage progression.
+                Complete your check-in to record employment progress.
               </p>
             </div>
           </div>
@@ -241,31 +308,167 @@ export default async function TraineeDashboardPage() {
             href="/trainee/followups"
             className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold shrink-0"
           >
-            <span>Complete Follow-Up</span>
+            Complete Follow-Up
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       )}
 
-      {/* Grid: Skills Snapshot + AI Employability Risk Explainer */}
+      {/* Top KPI row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        {/* Career Readiness */}
+        <div className="bg-white rounded-3xl p-5 border border-border shadow-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Career Readiness</p>
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
+          </div>
+          {readiness?.overall !== null && readiness !== null ? (
+            <>
+              <p className="font-display font-extrabold text-3xl text-charcoal-800">{readiness.overall}%</p>
+              <div className="mt-2 h-1 bg-sage-100 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${readiness.overall}%` }} />
+              </div>
+              <p className="text-[11px] text-muted mt-1">{readiness.dataQuality === "SUFFICIENT" ? "Based on profile" : "Partial data"}</p>
+            </>
+          ) : (
+            <>
+              <p className="font-display font-extrabold text-2xl text-charcoal-400">—</p>
+              <p className="text-[11px] text-muted mt-1">
+                {trainee.careerTarget ? "Add skills to calculate" : "Set career goal first"}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Skill Gap */}
+        <div className="bg-white rounded-3xl p-5 border border-border shadow-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Skill Gap</p>
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+          </div>
+          {skillGap.length > 0 ? (
+            <>
+              <p className="font-display font-extrabold text-3xl text-charcoal-800">
+                {skillGap.filter((g) => g.status === "MISSING" && g.importance === "REQUIRED").length}
+              </p>
+              <p className="text-[11px] text-muted mt-1">required skills missing</p>
+              <Link href="/trainee/recommendations" className="text-[11px] text-emerald-800 font-semibold hover:underline mt-1 block">
+                View gap →
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="font-display font-extrabold text-2xl text-charcoal-400">—</p>
+              <p className="text-[11px] text-muted mt-1">
+                {trainee.careerTarget ? "No career path data yet" : "Set a career goal"}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Roadmap progress */}
+        <div className="bg-white rounded-3xl p-5 border border-border shadow-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Roadmap</p>
+            <BookOpen className="w-3.5 h-3.5 text-emerald-700" />
+          </div>
+          {roadmapTotal > 0 ? (
+            <>
+              <p className="font-display font-extrabold text-3xl text-charcoal-800">
+                {roadmapCompleted}<span className="text-base text-muted">/{roadmapTotal}</span>
+              </p>
+              <div className="mt-2 h-1 bg-sage-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 rounded-full"
+                  style={{ width: `${(roadmapCompleted / roadmapTotal) * 100}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-muted mt-1">milestones done</p>
+            </>
+          ) : (
+            <>
+              <p className="font-display font-extrabold text-2xl text-charcoal-400">—</p>
+              <Link href="/trainee/roadmap" className="text-[11px] text-emerald-800 font-semibold hover:underline mt-1 block">
+                Generate roadmap →
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Verified Skills */}
+        <div className="bg-white rounded-3xl p-5 border border-border shadow-card">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Skills</p>
+            <Award className="w-3.5 h-3.5 text-emerald-700" />
+          </div>
+          <p className="font-display font-extrabold text-3xl text-charcoal-800">{trainee.skills.length}</p>
+          <p className="text-[11px] text-muted mt-1">in your profile</p>
+          <Link href="/trainee/skills" className="text-[11px] text-emerald-800 font-semibold hover:underline mt-1 block">
+            Manage →
+          </Link>
+        </div>
+      </div>
+
+      {/* Middle grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Skills Card (7 cols) */}
+        {/* Skill Gap breakdown (7 cols) */}
         <div className="lg:col-span-7 bg-white rounded-3xl p-6 border border-border shadow-card space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-emerald-800" />
+              <BarChart3 className="w-4 h-4 text-emerald-800" />
               <h3 className="font-display font-bold text-base text-charcoal-800">
-                Skill Profile & Verified Competencies
+                {trainee.careerTarget ? `Skill Gap: ${trainee.careerTarget.targetRole}` : "Skills Profile"}
               </h3>
             </div>
-            <Link href="/trainee/skills" className="text-xs text-emerald-800 hover:underline font-semibold">
-              Manage Skills →
+            <Link href="/trainee/recommendations" className="text-xs text-emerald-800 hover:underline font-semibold">
+              Full Analysis →
             </Link>
           </div>
 
           {trainee.skills.length === 0 ? (
-            <p className="text-xs text-muted py-4">No skills mapped yet. Add your core technical and soft skills.</p>
+            <div className="py-6 text-center border border-dashed border-border rounded-2xl">
+              <Award className="w-6 h-6 text-muted mx-auto mb-2" />
+              <p className="text-xs text-muted">No skills added yet.</p>
+              <Link href="/trainee/skills" className="text-xs text-emerald-800 font-semibold hover:underline">
+                Add your skills →
+              </Link>
+            </div>
+          ) : skillGap.length > 0 ? (
+            <div className="space-y-2">
+              {/* Show strong, developing, missing */}
+              {skillGap.filter((g) => g.importance === "REQUIRED").slice(0, 8).map((g) => (
+                <div key={g.skillId} className="flex items-center justify-between text-xs">
+                  <span className={`font-medium ${
+                    g.status === "STRONG" ? "text-charcoal-700" :
+                    g.status === "DEVELOPING" ? "text-amber-700" :
+                    "text-red-700"
+                  }`}>
+                    {g.skillName}
+                  </span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    g.status === "STRONG" ? "bg-emerald-50 text-emerald-700" :
+                    g.status === "DEVELOPING" ? "bg-amber-50 text-amber-700" :
+                    "bg-red-50 text-red-700"
+                  }`}>
+                    {g.status === "STRONG" ? "Strong" : g.status === "DEVELOPING" ? "Developing" : "Missing"}
+                  </span>
+                </div>
+              ))}
+              {missingRequiredSkills.length > 0 && (
+                <div className="pt-2 border-t border-border/50">
+                  <p className="text-[10px] text-muted font-semibold uppercase tracking-wider mb-1">Top Gaps to Close</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {missingRequiredSkills.map((g) => (
+                      <span key={g.skillId} className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[11px] font-medium border border-red-100">
+                        {g.skillName}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex flex-wrap gap-2">
               {trainee.skills.map((ts) => (
@@ -282,31 +485,25 @@ export default async function TraineeDashboardPage() {
           )}
         </div>
 
-        {/* AI Employability Risk Diagnostic (5 cols) */}
+        {/* AI Diagnostic (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-3xl p-6 border border-border shadow-card space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-emerald-700" />
               <h3 className="font-display font-bold text-base text-charcoal-800">
-                AI Outcome Diagnostic
+                AI Diagnostic
               </h3>
             </div>
-            <span
-              className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
-                riskReport.riskLevel === "LOW"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                  : riskReport.riskLevel === "MODERATE"
-                  ? "bg-amber-50 text-amber-800 border-amber-200"
-                  : "bg-red-50 text-red-800 border-red-200"
-              }`}
-            >
+            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+              riskReport.riskLevel === "LOW" ? "bg-emerald-50 text-emerald-800 border-emerald-200" :
+              riskReport.riskLevel === "MODERATE" ? "bg-amber-50 text-amber-800 border-amber-200" :
+              "bg-red-50 text-red-800 border-red-200"
+            }`}>
               {riskReport.riskLevel} RISK
             </span>
           </div>
 
-          <p className="text-xs text-muted leading-relaxed">
-            {riskReport.advisorySummary}
-          </p>
+          <p className="text-xs text-muted leading-relaxed">{riskReport.advisorySummary}</p>
 
           <div className="space-y-1.5 pt-2 border-t border-border/50 text-[11px]">
             {riskReport.primaryFactors.slice(0, 3).map((f, idx) => (
@@ -318,32 +515,46 @@ export default async function TraineeDashboardPage() {
               </div>
             ))}
           </div>
-        </div>
 
+          {/* Readiness breakdown if available */}
+          {readiness?.breakdown?.skills !== null && readiness !== null && (
+            <div className="pt-2 border-t border-border/50 space-y-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Readiness Breakdown</p>
+              {[
+                { label: "Skills", val: readiness.breakdown.skills },
+                { label: "Projects", val: readiness.breakdown.projects },
+                { label: "Certifications", val: readiness.breakdown.certifications },
+              ].map(({ label, val }) => (
+                <div key={label} className="flex items-center gap-2 text-[11px]">
+                  <span className="w-20 text-muted">{label}</span>
+                  <div className="flex-1 h-1 bg-sage-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full"
+                      style={{ width: `${val ?? 0}%` }}
+                    />
+                  </div>
+                  <span className="font-bold text-charcoal-700 w-8 text-right">{val ?? "—"}{val !== null ? "%" : ""}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Longitudinal Timeline Section */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-border shadow-card space-y-6">
+      {/* Timeline */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-border shadow-card space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-display font-bold text-lg text-charcoal-800">
-              Longitudinal Career Timeline
-            </h3>
-            <p className="text-xs text-muted">
-              Chronological lifecycle tracking from training enrollment to retention milestones
-            </p>
+            <h3 className="font-display font-bold text-lg text-charcoal-800">Career Timeline</h3>
+            <p className="text-xs text-muted">Training → certification → employment → retention milestones</p>
           </div>
-          <Link
-            href="/trainee/outcomes"
-            className="text-xs font-semibold text-emerald-800 hover:underline"
-          >
-            Add Career Event +
+          <Link href="/trainee/outcomes" className="text-xs font-semibold text-emerald-800 hover:underline">
+            Add Event +
           </Link>
         </div>
-
         <Timeline
           events={timelineEvents}
-          emptyMessage="No training or employment milestones recorded yet. Add your employment history to begin tracking."
+          emptyMessage="No events yet. Add your employment history to start tracking your career journey."
         />
       </div>
 

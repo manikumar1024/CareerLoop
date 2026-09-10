@@ -1,6 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import Footer from "@/components/Footer";
@@ -13,7 +14,17 @@ export default async function TraineeLayout({
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/signin?role=TRAINEE&callbackUrl=/trainee");
+    redirect("/signin?callbackUrl=/trainee");
+  }
+
+  // If the user has no trainee profile yet, send them through onboarding
+  const traineeProfile = await prisma.traineeProfile.findUnique({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+
+  if (!traineeProfile) {
+    redirect("/onboarding");
   }
 
   return (

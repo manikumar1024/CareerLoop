@@ -111,7 +111,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "careerloop-secure-jwt-key-production",
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export async function getCurrentUser() {

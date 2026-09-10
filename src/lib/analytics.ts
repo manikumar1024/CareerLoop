@@ -64,9 +64,10 @@ export async function getLongitudinalOverview() {
       ? Math.round(((avgCurrentSalary - avgInitialSalary) / avgInitialSalary) * 1000) / 10
       : 0;
 
+  const employmentsWithScore = employments.filter(e => e.skillRelevanceScore !== null);
   const avgSkillRelevanceScore =
-    employments.length > 0
-      ? Math.round((employments.reduce((acc, curr) => acc + curr.skillRelevanceScore, 0) / employments.length) * 10) / 10
+    employmentsWithScore.length > 0
+      ? Math.round((employmentsWithScore.reduce((acc, curr) => acc + (curr.skillRelevanceScore ?? 0), 0) / employmentsWithScore.length) * 10) / 10
       : 0;
 
   return {

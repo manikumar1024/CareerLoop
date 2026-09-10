@@ -16,6 +16,7 @@ export default async function TraineeSkillsPage() {
     where: { userId: user.id },
     include: {
       skills: { include: { skill: true } },
+      skillEvidence: { include: { skill: true }, orderBy: { createdAt: "desc" } },
     },
   });
 
@@ -87,6 +88,50 @@ export default async function TraineeSkillsPage() {
     await prisma.traineeSkill.delete({ where: { id: traineeSkillId } });
     revalidatePath("/trainee/skills");
     revalidatePath("/trainee");
+  }
+
+  async function addEvidenceAction(formData: FormData) {
+    "use server";
+    const userSession = await getCurrentUser();
+    if (!userSession) return;
+
+    const traineeProfile = await prisma.traineeProfile.findUnique({ where: { userId: userSession.id } });
+    if (!traineeProfile) return;
+
+    const skillId = formData.get("evidenceSkillId") as string;
+    const sourceType = formData.get("sourceType") as string;
+    const description = formData.get("evidenceDescription") as string;
+    const evidenceUrl = formData.get("evidenceUrl") as string;
+
+    if (!skillId || !sourceType) return;
+
+    // Confidence level based on source type
+    const CONFIDENCE_MAP: Record<string, string> = {
+      SELF_DECLARED: "LOW",
+      RESUME: "LOW",
+      PROJECT: "MEDIUM",
+      TRAINING: "MEDIUM",
+      ASSESSMENT: "HIGH",
+      CERTIFICATION: "HIGH",
+      EMPLOYER: "VERY_HIGH",
+      GITHUB: "MEDIUM",
+      LEETCODE: "MEDIUM",
+      OTHER: "LOW",
+    };
+
+    await prisma.skillEvidence.create({
+      data: {
+        traineeId: traineeProfile.id,
+        skillId,
+        sourceType,
+        description: description || null,
+        evidenceUrl: evidenceUrl || null,
+        verificationStatus: "UNVERIFIED",
+        confidenceLevel: CONFIDENCE_MAP[sourceType] || "LOW",
+      },
+    });
+
+    revalidatePath("/trainee/skills");
   }
 
   return (
@@ -241,6 +286,132 @@ export default async function TraineeSkillsPage() {
 
         </div>
 
+      </div>
+
+      {/* Skill Evidence Section */}
+      <div className="bg-white rounded-3xl p-6 border border-border shadow-card space-y-4">
+        <div className="flex items-center gap-2 pb-3 border-b border-border/50">
+          <ShieldCheck className="w-5 h-5 text-emerald-700" />
+          <div>
+            <h3 className="font-display font-bold text-base text-charcoal-800">
+              Skill Evidence ({trainee.skillEvidence.length})
+            </h3>
+            <p className="text-[11px] text-muted">
+              Evidence strengthens your skill profile. Self-declared evidence starts as UNVERIFIED — it gains confidence through assessments, employer verification, or certification.
+            </p>
+          </div>
+        </div>
+
+        {/* Evidence Confidence Explanation */}
+        <div className="p-3 rounded-xl bg-sage-50/60 border border-sage-200 text-xs">
+          <p className="font-semibold text-charcoal-800 mb-1.5">Evidence Confidence Levels:</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { type: "Self-Declared / Resume", level: "LOW", color: "bg-gray-100 text-gray-700" },
+              { type: "Project / Training", level: "MEDIUM", color: "bg-amber-50 text-amber-800" },
+              { type: "Assessment / Certification", level: "HIGH", color: "bg-blue-50 text-blue-800" },
+              { type: "Employer Verified", level: "VERY HIGH", color: "bg-emerald-50 text-emerald-800" },
+            ].map(e => (
+              <span key={e.type} className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-current/20 ${e.color}`}>
+                {e.type} → {e.level}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Existing Evidence */}
+        {trainee.skillEvidence.length > 0 && (
+          <div className="space-y-2">
+            {trainee.skillEvidence.map(ev => (
+              <div key={ev.id} className="flex items-start justify-between gap-3 p-3 rounded-xl bg-sage-50/40 border border-sage-200 text-xs">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-charcoal-800">{ev.skill.name}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                      ev.confidenceLevel === "VERY_HIGH" ? "bg-emerald-50 text-emerald-800" :
+                      ev.confidenceLevel === "HIGH" ? "bg-blue-50 text-blue-800" :
+                      ev.confidenceLevel === "MEDIUM" ? "bg-amber-50 text-amber-800" :
+                      "bg-gray-100 text-gray-700"
+                    }`}>
+                      {ev.confidenceLevel}
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-border text-muted">
+                      {ev.sourceType.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                  {ev.description && <p className="text-muted">{ev.description}</p>}
+                  <div className="flex gap-2 text-[10px] text-muted">
+                    <span className={`font-semibold ${
+                      ev.verificationStatus === "VERIFIED" ? "text-emerald-700" :
+                      ev.verificationStatus === "PENDING" ? "text-amber-700" :
+                      "text-gray-600"
+                    }`}>
+                      {ev.verificationStatus}
+                    </span>
+                  </div>
+                </div>
+                {ev.evidenceUrl && (
+                  <a href={ev.evidenceUrl} target="_blank" rel="noopener noreferrer"
+                    className="text-emerald-800 font-semibold text-[11px] hover:underline shrink-0">
+                    View →
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add Evidence Form */}
+        <form action={addEvidenceAction} className="space-y-3 text-xs p-4 rounded-xl border border-dashed border-border">
+          <p className="font-semibold text-charcoal-700">Add Skill Evidence</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-charcoal-700 mb-1">Skill *</label>
+              <select name="evidenceSkillId" required
+                className="w-full px-3 py-2 rounded-xl border border-border bg-white focus:ring-2 focus:ring-emerald-500/20">
+                <option value="">-- Select Skill --</option>
+                {trainee.skills.map(ts => (
+                  <option key={ts.skillId} value={ts.skillId}>{ts.skill.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-charcoal-700 mb-1">Evidence Source *</label>
+              <select name="sourceType" required
+                className="w-full px-3 py-2 rounded-xl border border-border bg-white focus:ring-2 focus:ring-emerald-500/20">
+                <option value="SELF_DECLARED">Self Declared</option>
+                <option value="RESUME">Resume</option>
+                <option value="PROJECT">Personal Project</option>
+                <option value="TRAINING">Training Program</option>
+                <option value="ASSESSMENT">Assessment Score</option>
+                <option value="CERTIFICATION">Certification</option>
+                <option value="GITHUB">GitHub Repository</option>
+                <option value="LEETCODE">LeetCode</option>
+                <option value="EMPLOYER">Employer Reference</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-charcoal-700 mb-1">Description</label>
+              <input type="text" name="evidenceDescription" placeholder="e.g. Built REST API using Node.js"
+                className="w-full px-3 py-2 rounded-xl border border-border bg-white focus:ring-2 focus:ring-emerald-500/20" />
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-charcoal-700 mb-1">Evidence URL (optional)</label>
+              <input type="url" name="evidenceUrl" placeholder="https://github.com/..."
+                className="w-full px-3 py-2 rounded-xl border border-border bg-white focus:ring-2 focus:ring-emerald-500/20" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button type="submit"
+              className="px-4 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs transition">
+              Add Evidence
+            </button>
+            <p className="text-[10px] text-muted italic">
+              New evidence starts as UNVERIFIED. Verification requires external confirmation.
+            </p>
+          </div>
+        </form>
       </div>
 
     </div>

@@ -1,0 +1,393 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CareerLoop AI — Full Codebase Audit Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 13px; line-height: 1.6; color: #1f2328; background: #ffffff; }
+  .container { max-width: 760px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; font-weight: 700; color: #1f2328; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #57606a; margin-bottom: 28px; }
+  h2 { font-size: 14px; font-weight: 700; color: #1f2328; margin: 28px 0 10px; padding-bottom: 6px; border-bottom: 2px solid #e5e7eb; }
+  h3 { font-size: 12px; font-weight: 700; color: #3b82d4; margin: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { font-size: 13px; color: #1f2328; margin-bottom: 8px; }
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .meta-item { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 14px; font-size: 12px; }
+  .meta-item strong { display: block; color: #57606a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }
+  th { background: #f7f8fa; text-align: left; padding: 7px 10px; font-weight: 700; color: #57606a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; border: 1px solid #e5e7eb; }
+  td { padding: 6px 10px; border: 1px solid #e5e7eb; vertical-align: top; color: #1f2328; }
+  tr:nth-child(even) td { background: #f7f8fa; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .badge-green { background: #e6f4ec; color: #1a7340; border: 1px solid #b8ddc7; }
+  .badge-amber { background: #fff8e1; color: #7a5200; border: 1px solid #ffe082; }
+  .badge-red { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+  .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .badge-purple { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
+  .badge-gray { background: #f7f8fa; color: #57606a; border: 1px solid #e5e7eb; }
+  ul { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 3px; font-size: 12px; color: #1f2328; }
+  code { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 4px; padding: 1px 5px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; color: #3b82d4; }
+  .warn { background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #7a5200; }
+  .ok { background: #e6f4ec; border: 1px solid #b8ddc7; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #1a7340; }
+  .gap-row td:first-child { font-weight: 600; }
+  .section-intro { font-size: 12px; color: #57606a; margin-bottom: 10px; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 11px; color: #57606a; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>CareerLoop AI — Complete Codebase Audit Report</h1>
+  <p class="subtitle">Full static audit of all files, models, references, navigation, and gaps. Generated for transformation planning.</p>
+
+  <div class="meta">
+    <div class="meta-item"><strong>Project Name</strong>careerloop-ai</div>
+    <div class="meta-item"><strong>Framework</strong>Next.js 14.2.18 (App Router)</div>
+    <div class="meta-item"><strong>Database</strong>SQLite via Prisma 5.22</div>
+    <div class="meta-item"><strong>Auth</strong>NextAuth 4.24 (JWT + Credentials + Google)</div>
+    <div class="meta-item"><strong>AI Layer</strong>Google Gemini 1.5 Flash (optional) + Deterministic Engine</div>
+    <div class="meta-item"><strong>UI Stack</strong>React 18, Tailwind CSS 3.4, Recharts, Lucide Icons</div>
+    <div class="meta-item"><strong>Fonts</strong>Plus Jakarta Sans (body) + Outfit (display)</div>
+  </div>
+
+  
+  <h2>1. TECHNOLOGY STACK (CONFIRMED)</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td>Next.js App Router</td><td>14.2.18</td><td>Server Components, Server Actions, Layout nesting</td></tr>
+      <tr><td>Language</td><td>TypeScript</td><td>5.6.3</td><td>Strict mode implied</td></tr>
+      <tr><td>Database</td><td>SQLite (Prisma)</td><td>Prisma 5.22</td><td>File-based DB — env DATABASE_URL</td></tr>
+      <tr><td>Auth</td><td>NextAuth.js</td><td>4.24.10</td><td>JWT sessions; Credentials + optional Google OAuth</td></tr>
+      <tr><td>AI</td><td>Google Generative AI</td><td>@google/generative-ai ^0.21</td><td>gemini-1.5-flash; graceful fallback to deterministic</td></tr>
+      <tr><td>Styling</td><td>Tailwind CSS</td><td>3.4.14</td><td>Custom charcoal/emerald/sage/amber palette</td></tr>
+      <tr><td>Charts</td><td>Recharts</td><td>2.13.3</td><td>Used in 4 chart components</td></tr>
+      <tr><td>Icons</td><td>Lucide React</td><td>0.454.0</td><td>Consistent icon usage throughout</td></tr>
+      <tr><td>Password</td><td>bcryptjs</td><td>2.4.3</td><td>Hashing with salt rounds=10</td></tr>
+      <tr><td>Class utils</td><td>clsx + tailwind-merge</td><td>latest</td><td>cn() utility in lib/utils.ts</td></tr>
+    </tbody>
+  </table>
+
+  
+  <h2>2. COMPLETE FILE INVENTORY</h2>
+
+  <h3>2a. API Routes</h3>
+  <table>
+    <thead><tr><th>Route</th><th>Method(s)</th><th>Auth Required</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/api/auth/[...nextauth]</code></td><td>GET, POST</td><td>—</td><td>NextAuth handler (sign-in, register, session)</td></tr>
+      <tr><td><code>/api/onboarding</code></td><td>POST</td><td>Yes (session)</td><td>Creates role profile; generates traineeId, sets org name</td></tr>
+      <tr><td><code>/api/reports/export</code></td><td>GET</td><td>GOVERNMENT_ADMIN only</td><td>CSV export of all trainee longitudinal outcomes</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2b. Page Files — Public / Auth</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/app/page.tsx</code></td><td>Server Component</td><td>Landing page — real-time metrics from DB, lifecycle pipeline, role hub cards</td></tr>
+      <tr><td><code>src/app/signin/page.tsx</code></td><td>Client Component</td><td>Sign-in / register with role selector + Quick Demo Access panel</td></tr>
+      <tr><td><code>src/app/onboarding/page.tsx</code></td><td>Client Component</td><td>Step-2 role profile selector post-auth; calls /api/onboarding</td></tr>
+      <tr><td><code>src/app/privacy/page.tsx</code></td><td>—</td><td>Privacy policy page (not read — static content)</td></tr>
+      <tr><td><code>src/app/how-it-works/page.tsx</code></td><td>—</td><td>Explainer page (not read — static content)</td></tr>
+      <tr><td><code>src/app/architecture/page.tsx</code></td><td>—</td><td>Interactive architecture flow (uses ArchitectureFlow component)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2c. Trainee Portal Pages (<code>/trainee/*</code>)</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Status</th><th>Key Functionality</th></tr></thead>
+    <tbody>
+      <tr><td><code>/trainee</code> (dashboard)</td><td><span class="badge badge-green">Complete</span></td><td>KPIs, longitudinal timeline, AI risk diagnostic, next-action banner, career target context, follow-up alert</td></tr>
+      <tr><td><code>/trainee/profile</code></td><td><span class="badge badge-green">Complete</span></td><td>Edit district, education, phone, bio, status; unique traineeId display</td></tr>
+      <tr><td><code>/trainee/identity</code></td><td><span class="badge badge-green">Complete</span></td><td>Bio, projects (add/display), external profiles (GitHub, LinkedIn, LeetCode), bio update</td></tr>
+      <tr><td><code>/trainee/career-target</code></td><td><span class="badge badge-green">Complete</span></td><td>Set/update target role, industry, locations, salary range, employment type, experience level; role taxonomy selector</td></tr>
+      <tr><td><code>/trainee/skills</code></td><td><span class="badge badge-green">Complete</span></td><td>Add skills from taxonomy or custom, set proficiency, delete; add skill evidence with confidence levels</td></tr>
+      <tr><td><code>/trainee/coach</code></td><td><span class="badge badge-green">Complete</span></td><td>AI career coach — next best action, profile intelligence, skill gap summary, ordered action list</td></tr>
+      <tr><td><code>/trainee/recommendations</code></td><td><span class="badge badge-green">Complete</span></td><td>AI skill gap analyzer — role selector, matched/missing skills, 3-phase learning pathway</td></tr>
+      <tr><td><code>/trainee/training</code></td><td><span class="badge badge-green">Complete</span></td><td>Enrollments with 4-step pathway visualization; certifications display</td></tr>
+      <tr><td><code>/trainee/certifications</code></td><td><span class="badge badge-green">Complete</span></td><td>Credential wallet with verification lifecycle; status explanations</td></tr>
+      <tr><td><code>/trainee/jobs</code></td><td><span class="badge badge-green">Complete</span></td><td>Open jobs with skill-match scoring; one-click apply; career target context banner</td></tr>
+      <tr><td><code>/trainee/applications</code></td><td><span class="badge badge-green">Complete</span></td><td>Application tracking with status pipeline; active vs closed split</td></tr>
+      <tr><td><code>/trainee/outcomes</code></td><td><span class="badge badge-green">Complete</span></td><td>Record formal employment (links to employer), self-employment ventures</td></tr>
+      <tr><td><code>/trainee/timeline</code></td><td><span class="badge badge-green">Complete</span></td><td>Full chronological career timeline grouped by year; all event types</td></tr>
+      <tr><td><code>/trainee/followups</code></td><td><span class="badge badge-green">Complete</span></td><td>30/90/180/365-day milestone surveys; auto-initializes 4 records; updates trainee status</td></tr>
+      <tr><td><code>/trainee/settings</code></td><td><span class="badge badge-green">Complete</span></td><td>Consent management (grant/revoke), audit activity trail (last 10)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2d. Employer Portal Pages (<code>/employer/*</code>)</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Status</th><th>Key Functionality</th></tr></thead>
+    <tbody>
+      <tr><td><code>/employer</code> (dashboard)</td><td><span class="badge badge-green">Complete</span></td><td>Pending verification queue, verified employee list, KPI metrics, inline verify/reject server actions</td></tr>
+      <tr><td><code>/employer/jobs</code></td><td><span class="badge badge-green">Complete</span></td><td>Post jobs with skill requirements; open/close job status; view applications link</td></tr>
+      <tr><td><code>/employer/applications</code></td><td><span class="badge badge-green">Complete</span></td><td>View candidate applications per job</td></tr>
+      <tr><td><code>/employer/candidates</code></td><td><span class="badge badge-green">Complete</span></td><td>Browse verified trainee profiles (file exists, not audited in depth)</td></tr>
+      <tr><td><code>/employer/employees</code></td><td><span class="badge badge-amber">Exists</span></td><td>Full verified employee roster (file exists)</td></tr>
+      <tr><td><code>/employer/verifications</code></td><td><span class="badge badge-green">Complete</span></td><td>Dedicated verification queue page</td></tr>
+      <tr><td><code>/employer/analytics</code></td><td><span class="badge badge-green">Complete</span></td><td>Retention analytics</td></tr>
+      <tr><td><code>/employer/profile</code></td><td><span class="badge badge-green">Complete</span></td><td>Company profile edit</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2e. Training Provider Portal Pages (<code>/provider/*</code>)</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Status</th><th>Key Functionality</th></tr></thead>
+    <tbody>
+      <tr><td><code>/provider</code> (dashboard)</td><td><span class="badge badge-green">Complete</span></td><td>Program cohort list with enrolled/certified/placed metrics per program</td></tr>
+      <tr><td><code>/provider/programs</code></td><td><span class="badge badge-green">Complete</span></td><td>Manage training programs and batches</td></tr>
+      <tr><td><code>/provider/outcomes</code></td><td><span class="badge badge-green">Complete</span></td><td>Placement &amp; outcome tracking</td></tr>
+      <tr><td><code>/provider/analytics</code></td><td><span class="badge badge-green">Complete</span></td><td>Outcome analytics charts</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2f. Government Admin Portal Pages (<code>/admin/*</code>)</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Status</th><th>Key Functionality</th></tr></thead>
+    <tbody>
+      <tr><td><code>/admin</code> (dashboard)</td><td><span class="badge badge-green">Complete</span></td><td>Macro KPIs, retention curve, wage progression, non-placement pie chart, district rankings, AI policy insights</td></tr>
+      <tr><td><code>/admin/outcomes</code></td><td><span class="badge badge-green">Complete</span></td><td>Outcome intelligence drill-down</td></tr>
+      <tr><td><code>/admin/districts</code></td><td><span class="badge badge-green">Complete</span></td><td>District heatmap</td></tr>
+      <tr><td><code>/admin/courses</code></td><td><span class="badge badge-green">Complete</span></td><td>Course performance analysis</td></tr>
+      <tr><td><code>/admin/providers</code></td><td><span class="badge badge-green">Complete</span></td><td>Provider scorecard</td></tr>
+      <tr><td><code>/admin/skills</code></td><td><span class="badge badge-green">Complete</span></td><td>Skill demand analytics; full skill taxonomy management</td></tr>
+      <tr><td><code>/admin/retention</code></td><td><span class="badge badge-green">Complete</span></td><td>Retention &amp; wages detail</td></tr>
+      <tr><td><code>/admin/reports</code></td><td><span class="badge badge-green">Complete</span></td><td>Policy interventions &amp; CSV export trigger</td></tr>
+      <tr><td><code>/admin/audit</code></td><td><span class="badge badge-green">Complete</span></td><td>Immutable audit log trail + consent records table</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2g. Components</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>Navbar.tsx</code></td><td>Client</td><td>Sticky top nav; role-aware dashboard link; mobile hamburger menu; sign-out button</td></tr>
+      <tr><td><code>DashboardSidebar.tsx</code></td><td>Client</td><td>Role-based sidebar navigation (14 trainee links, 8 employer, 4 provider, 9 admin)</td></tr>
+      <tr><td><code>Footer.tsx</code></td><td>Server</td><td>4-column footer with portal links, mission statement</td></tr>
+      <tr><td><code>MetricCard.tsx</code></td><td>Server</td><td>Reusable KPI card with title, value, badge, trend, icon</td></tr>
+      <tr><td><code>StatusBadge.tsx</code></td><td>Server</td><td>Color-coded status chip for employment/verification states</td></tr>
+      <tr><td><code>SkillBadge.tsx</code></td><td>Server</td><td>Skill chip with proficiency + verification indicators</td></tr>
+      <tr><td><code>EmptyState.tsx</code></td><td>Server</td><td>Consistent empty state with action CTA</td></tr>
+      <tr><td><code>Timeline.tsx</code></td><td>Server</td><td>Longitudinal timeline renderer with event types (TRAINING, CERTIFICATION, EMPLOYMENT, PLACEMENT, FOLLOWUP)</td></tr>
+      <tr><td><code>Skeleton.tsx</code></td><td>Server</td><td>Loading skeleton placeholders</td></tr>
+      <tr><td><code>Providers.tsx</code></td><td>Client</td><td>NextAuth SessionProvider wrapper</td></tr>
+      <tr><td><code>ArchitectureFlow.tsx</code></td><td>—</td><td>Interactive system architecture visualization</td></tr>
+      <tr><td><code>Charts/NonPlacementPie.tsx</code></td><td>Client</td><td>Recharts pie chart — non-placement reasons</td></tr>
+      <tr><td><code>Charts/DistrictHeatBar.tsx</code></td><td>Client</td><td>Bar chart — district employment rates</td></tr>
+      <tr><td><code>Charts/OutcomeRetentionChart.tsx</code></td><td>Client</td><td>Line chart — 30/90/180/365-day retention curve</td></tr>
+      <tr><td><code>Charts/WageProgressionChart.tsx</code></td><td>Client</td><td>Bar chart — initial vs current average salary</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2h. Library Files (<code>src/lib/</code>)</h3>
+  <table>
+    <thead><tr><th>File</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth.ts</code></td><td>NextAuth config; Credentials + Google providers; JWT/session callbacks; auto-creates user on first login</td></tr>
+      <tr><td><code>prisma.ts</code></td><td>Prisma client singleton with global instance caching</td></tr>
+      <tr><td><code>ai-service.ts</code></td><td>INDUSTRY_ROLE_TAXONOMY (7 roles), analyzeSkillGap(), evaluateEmployabilityRisk(), synthesizeGovernmentPolicyInsights() — all with deterministic fallback</td></tr>
+      <tr><td><code>analytics.ts</code></td><td>getLongitudinalOverview(), getDistrictAnalytics(), getNonPlacementDistribution() — all pure DB queries, no fake data</td></tr>
+      <tr><td><code>audit.ts</code></td><td>logAuditAction() — writes AuditLog records</td></tr>
+      <tr><td><code>utils.ts</code></td><td>cn(), formatCurrency() (INR), formatDate(), formatPercent(), generateTraineeId() (CLP-YYYY-XXXXXX), generateCertificateNumber() (NSDC-XXXXXXXX)</td></tr>
+    </tbody>
+  </table>
+
+  
+  <h2>3. COMPLETE PRISMA SCHEMA MODEL INVENTORY</h2>
+  <p class="section-intro">Database: SQLite. Total models: 20.</p>
+
+  <table>
+    <thead><tr><th>Model</th><th>Key Fields</th><th>Relations (outbound)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>User</strong></td><td>id, name, email (unique), emailVerified, passwordHash, image, role (TRAINEE/EMPLOYER/TRAINING_PROVIDER/GOVERNMENT_ADMIN), adminApproved, consentGiven, consentTimestamp</td><td>→ Account, Session, TraineeProfile, EmployerProfile, TrainingProviderProfile, AuditLog, ConsentRecord</td></tr>
+      <tr><td><strong>Account</strong></td><td>OAuth account fields (provider, providerAccountId, tokens)</td><td>→ User</td></tr>
+      <tr><td><strong>Session</strong></td><td>sessionToken (unique), userId, expires</td><td>→ User</td></tr>
+      <tr><td><strong>TraineeProfile</strong></td><td>traineeId (CLP-YYYY-XXXXX unique), dateOfBirth, gender, district, state, educationLevel, phone, bio, currentStatus (TRAINING/CERTIFIED/EMPLOYED/SELF_EMPLOYED/APPRENTICESHIP/UNEMPLOYED/FURTHER_STUDIES)</td><td>→ TraineeSkill, SkillEvidence, Enrollment, Certification, EmploymentRecord, SelfEmploymentRecord, ApprenticeshipRecord, FollowUp, NonPlacementRecord, Assessment, CareerTarget, Project, ExternalProfile, Application, CompensationHistory</td></tr>
+      <tr><td><strong>CareerTarget</strong></td><td>targetRole, industry, preferredLocations (CSV), targetSalaryMin/Max, employmentType, experienceLevel, targetDate, priority</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>Project</strong></td><td>title, description, techStack (CSV), url, repoUrl, startDate, endDate, isHighlighted</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>ExternalProfile</strong></td><td>platform (GITHUB/LEETCODE/CODECHEF/LINKEDIN/PORTFOLIO), username, profileUrl, accessToken (encrypted), isConnected, lastSyncedAt, rawData (JSON cache)</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>SkillEvidence</strong></td><td>sourceType (RESUME/PROJECT/TRAINING/ASSESSMENT/CERTIFICATION/GITHUB/LEETCODE/EMPLOYER/SELF_DECLARED/OTHER), verificationStatus (UNVERIFIED/PENDING/VERIFIED/REJECTED), confidenceLevel (LOW/MEDIUM/HIGH/VERY_HIGH), evidenceUrl, verifiedBy, verifiedAt</td><td>→ TraineeProfile, Skill</td></tr>
+      <tr><td><strong>EmployerProfile</strong></td><td>companyName, industry, district, state, companySize, website, contactEmail, isVerified</td><td>→ User, EmploymentRecord[], Job[]</td></tr>
+      <tr><td><strong>TrainingProviderProfile</strong></td><td>institutionName, accreditationNumber, centerType, district, state, contactEmail, isVerified</td><td>→ User, TrainingProgram[]</td></tr>
+      <tr><td><strong>TrainingProgram</strong></td><td>code (unique), title, sector, description, durationWeeks, minHours, status (ACTIVE/…), skillsOffered (CSV)</td><td>→ TrainingProviderProfile, Course[], Enrollment[], Certification[], NonPlacementRecord[]</td></tr>
+      <tr><td><strong>Course</strong></td><td>title, level, description, curriculum, requiredPrereqs</td><td>→ TrainingProgram</td></tr>
+      <tr><td><strong>Enrollment</strong></td><td>enrollmentDate, completionDate, attendancePercentage (nullable — no fake default), status (ENROLLED/IN_PROGRESS/COMPLETED/DROPPED/FAILED), grade</td><td>→ TraineeProfile, TrainingProgram, Assessment[]</td></tr>
+      <tr><td><strong>Assessment</strong></td><td>title, assessmentDate, maxScore, scoreObtained, passed, feedback</td><td>→ Enrollment, TraineeProfile</td></tr>
+      <tr><td><strong>Certification</strong></td><td>certificateNumber (unique), credentialUrl, issueDate, expiryDate, issuingAuthority, verificationStatus (UPLOADED/PENDING_VERIFICATION/PROVIDER_VERIFIED/VERIFIED/REJECTED/EXPIRED), verificationNotes, verifiedAt</td><td>→ TraineeProfile, TrainingProgram</td></tr>
+      <tr><td><strong>Skill</strong></td><td>name (unique), category (Technical/Soft Skill/Domain), standardCode, description</td><td>→ TraineeSkill[], SkillEvidence[], JobSkillRequirement[]</td></tr>
+      <tr><td><strong>TraineeSkill</strong></td><td>proficiencyLevel (BEGINNER/INTERMEDIATE/ADVANCED/EXPERT), verificationStatus, verifiedByAssessment, verifiedByEmployer, addedAt</td><td>→ TraineeProfile, Skill; unique (traineeId, skillId)</td></tr>
+      <tr><td><strong>EmploymentRecord</strong></td><td>companyName, jobTitle, locationDistrict, locationState, monthlySalary, employmentType, startDate, endDate, isCurrent, skillRelevanceScore (nullable), verificationStatus (SELF_REPORTED/PENDING_VERIFICATION/EMPLOYER_VERIFIED/REJECTED), verificationNotes, verifiedAt</td><td>→ TraineeProfile, EmployerProfile (optional)</td></tr>
+      <tr><td><strong>CompensationHistory</strong></td><td>monthlySalary, recordedAt, source (SELF_REPORTED/EMPLOYER_VERIFIED/FOLLOWUP), notes</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>SelfEmploymentRecord</strong></td><td>businessName, businessType, sector, startDate, monthlyNetIncome, employeesHired, skillsApplied, businessStatus (ACTIVE/SCALING/PAUSED/CLOSED)</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>ApprenticeshipRecord</strong></td><td>hostOrganization, tradeRole, stipendAmount, startDate, endDate, isCompleted, offeredFullTimeJob, skillsAcquired</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>Job</strong></td><td>title, description, industry, locationDistrict, locationState, salaryMin, salaryMax, employmentType, experienceLevel, educationRequired, status (OPEN/CLOSED/FILLED/PAUSED), deadline</td><td>→ EmployerProfile, JobSkillRequirement[], Application[]</td></tr>
+      <tr><td><strong>JobSkillRequirement</strong></td><td>required (boolean), minLevel; unique (jobId, skillId)</td><td>→ Job, Skill</td></tr>
+      <tr><td><strong>Application</strong></td><td>status (APPLIED/SHORTLISTED/INTERVIEW_SCHEDULED/OFFER_MADE/ACCEPTED/REJECTED/WITHDRAWN), appliedAt, notes; unique (traineeId, jobId)</td><td>→ TraineeProfile, Job</td></tr>
+      <tr><td><strong>FollowUp</strong></td><td>milestoneDays (30/90/180/365), scheduledDate, completedDate, isCompleted, isEmployed, employmentType, companyName, jobTitle, currentSalary, sameEmployerAsPlacement, skillRelevanceScore, promotionReceived, wageIncreasePercent, trainingRelevance, nonPlacementReason, nonPlacementNotes, feedback</td><td>→ TraineeProfile</td></tr>
+      <tr><td><strong>NonPlacementRecord</strong></td><td>primaryReason (SKILL_GAP/LACK_OF_LOCAL_JOBS/SALARY_MISMATCH/COMMUNICATION_SKILLS/LOCATION_MOBILITY/FURTHER_EDUCATION/PERSONAL_REASON/OTHER), details, recordedAt</td><td>→ TraineeProfile, TrainingProgram (optional)</td></tr>
+      <tr><td><strong>AIInsight</strong></td><td>targetType, targetId, insightType (SKILL_GAP/RISK_ALERT/CAREER_PATH/POLICY_RECOMMENDATION/WAGE_BENCHMARK), title, score, explanation, recommendations (JSON), modelVersion, confidence, dataFreshness</td><td>No relations (standalone log)</td></tr>
+      <tr><td><strong>PolicyRecommendation</strong></td><td>district, sector, priority, issueSummary, recommendedAction, dataEvidence, expectedImpact, confidence, status (OPEN/UNDER_REVIEW/IMPLEMENTED)</td><td>No relations (standalone)</td></tr>
+      <tr><td><strong>ConsentRecord</strong></td><td>purpose, dataFieldsGranted, ipAddress, userAgent, grantedAt, revokedAt</td><td>→ User</td></tr>
+      <tr><td><strong>AuditLog</strong></td><td>userId, role, action, targetEntity, targetEntityId, metadata (JSON), ipAddress, before (JSON), after (JSON), createdAt</td><td>→ User (optional)</td></tr>
+    </tbody>
+  </table>
+
+  
+  <h2>4. SIH / HACKATHON / FAKE / DEMO REFERENCES FOUND</h2>
+
+  <div class="warn">⚠️ These are ALL occurrences of demo, fake, mock, hardcoded or hackathon-adjacent content found in the codebase.</div>
+
+  <table>
+    <thead><tr><th>File</th><th>Line</th><th>Content</th><th>Risk Level</th></tr></thead>
+    <tbody>
+      <tr class="gap-row"><td><code>src/app/signin/page.tsx</code></td><td>L88–L116</td><td><strong>handleQuickLogin()</strong> function — "Quick Demo Access" panel with 4 hardcoded seed-user emails (arjun.verma@example.com, admin@careerloop.gov.in, hr@infosolutions.com, director@puneskillhub.org) using hardcoded password <code>CareerLoop2026!</code></td><td><span class="badge badge-red">HIGH — Remove</span></td></tr>
+      <tr class="gap-row"><td><code>src/app/signin/page.tsx</code></td><td>L144</td><td>UI label: <code>"Quick Demo Access"</code> with Sparkles icon</td><td><span class="badge badge-red">HIGH — Remove</span></td></tr>
+      <tr class="gap-row"><td><code>src/app/signin/page.tsx</code></td><td>L44</td><td>Hardcoded fallback admin code: <code>"CAREERLOOP-GOV-ADMIN"</code></td><td><span class="badge badge-amber">MEDIUM — Move to env-only</span></td></tr>
+      <tr class="gap-row"><td><code>src/app/onboarding/page.tsx</code></td><td>L33</td><td>Same hardcoded admin code fallback: <code>"CAREERLOOP-GOV-ADMIN"</code></td><td><span class="badge badge-amber">MEDIUM — Move to env-only</span></td></tr>
+      <tr class="gap-row"><td><code>src/app/api/onboarding/route.ts</code></td><td>L20</td><td>Same hardcoded admin code fallback in API route</td><td><span class="badge badge-amber">MEDIUM — Move to env-only</span></td></tr>
+      <tr class="gap-row"><td><code>src/lib/auth.ts</code></td><td>L50</td><td>Comment: <code>"// create user if onboarding or demo"</code> — context only, not functional fake data</td><td><span class="badge badge-blue">LOW — Comment only</span></td></tr>
+      <tr class="gap-row"><td><code>src/lib/auth.ts</code></td><td>L56</td><td>Default password <code>"CareerLoop2026!"</code> used when no password supplied on user auto-creation</td><td><span class="badge badge-amber">MEDIUM — Acceptable for seed users; not production risk</span></td></tr>
+      <tr class="gap-row"><td><code>src/lib/ai-service.ts</code></td><td>L157</td><td>Learning path stage label: <code>"Mock interview assessments"</code> — this is legitimate text about conducting mock interviews, not fake data</td><td><span class="badge badge-green">NO RISK — Context is correct</span></td></tr>
+      <tr class="gap-row"><td><code>src/components/ArchitectureFlow.tsx</code></td><td>L88</td><td>Text: <code>"zero dummy data"</code> — this is a marketing claim in the architecture explainer, not code behavior</td><td><span class="badge badge-green">NO RISK — Marketing text</span></td></tr>
+      <tr class="gap-row"><td><code>src/lib/auth.ts</code></td><td>L114</td><td>Fallback NEXTAUTH_SECRET: <code>"careerloop-secure-jwt-key-production"</code> — hardcoded secret in code</td><td><span class="badge badge-red">HIGH — Must be env var only</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="ok">✅ NO SIH or "Smart India Hackathon" references found anywhere in the codebase. No hardcoded statistics, no fake dashboard numbers — all metrics derive from real database queries with explicit <code>hasData</code> guards showing "—" on empty DB.</div>
+
+  
+  <h2>5. CURRENT NAVIGATION STRUCTURE</h2>
+
+  <h3>5a. Public Navbar (all users)</h3>
+  <ul>
+    <li>PLATFORM → <code>/</code></li>
+    <li>HOW IT WORKS → <code>/how-it-works</code></li>
+    <li>ARCHITECTURE → <code>/architecture</code></li>
+    <li>PRIVACY &amp; TRUST → <code>/privacy</code></li>
+    <li>SIGN IN → <code>/signin</code> (if unauthenticated)</li>
+    <li>[Role] DASHBOARD → role-specific URL (if authenticated)</li>
+  </ul>
+
+  <h3>5b. Trainee Sidebar (14 links)</h3>
+  <p>Dashboard → Career Identity → Career Target → Skills &amp; Evidence → AI Career Coach → Learning Roadmap → Training → Certifications → Jobs → Applications → Employment → Career Timeline → Follow-ups → Settings &amp; Consent</p>
+
+  <h3>5c. Employer Sidebar (8 links)</h3>
+  <p>Dashboard → Company Profile → Jobs → Candidates → Applications → Verification Queue → Verified Employees → Retention Analytics</p>
+
+  <h3>5d. Training Provider Sidebar (4 links)</h3>
+  <p>Overview → Programs &amp; Batches → Placement &amp; Outcomes → Outcome Analytics</p>
+
+  <h3>5e. Government Admin Sidebar (9 links)</h3>
+  <p>Executive Overview → Outcome Intelligence → District Intelligence → Course Performance → Provider Scorecard → Skill Demand → Retention &amp; Wages → Interventions → Audit &amp; Consent</p>
+
+  
+  <h2>6. CURRENT USER FLOW</h2>
+
+  <h3>New User Flow</h3>
+  <ol style="padding-left:20px;font-size:12px;line-height:2">
+    <li>Lands on <code>/</code> — sees real-time metrics (or "—" if empty DB) + role hub cards</li>
+    <li>Clicks role CTA or SIGN IN → <code>/signin?role=TRAINEE</code></li>
+    <li>Either: (a) clicks "Quick Demo Access" seeded user, or (b) selects role + enters email/password</li>
+    <li>If no account exists: auto-created in DB by NextAuth credentials provider</li>
+    <li>Redirected to role dashboard; if no profile exists → shown <strong>EmptyState</strong> with "Setup Profile" → <code>/onboarding</code></li>
+    <li>Onboarding: selects role, provides district/org name → POST <code>/api/onboarding</code> → creates TraineeProfile/EmployerProfile/etc.</li>
+    <li>Redirected to role dashboard with initialized profile</li>
+  </ol>
+
+  <h3>Returning User Flow</h3>
+  <ol style="padding-left:20px;font-size:12px;line-height:2">
+    <li>Lands on <code>/</code>, session active → Navbar shows "[ROLE] DASHBOARD" link</li>
+    <li>Clicks dashboard → role layout applies sidebar + protects with getCurrentUser() auth check</li>
+    <li>If session expired: redirected to <code>/signin?callbackUrl=…</code></li>
+  </ol>
+
+  
+  <h2>7. AI SERVICE LAYER</h2>
+  <table>
+    <thead><tr><th>Function</th><th>Input</th><th>Output</th><th>Gemini Enhancement</th></tr></thead>
+    <tbody>
+      <tr><td><code>analyzeSkillGap()</code></td><td>targetRole, traineeSkills[]</td><td>matchedScore, matchedSkills, missingCriticalSkills, 3-phase learning path, explainableRationale</td><td>Yes — enriches rationale &amp; learning path with Gemini 1.5 Flash</td></tr>
+      <tr><td><code>evaluateEmployabilityRisk()</code></td><td>attendance, assessment score, skillsCount, isEmployed, hasCertifiedCredentials</td><td>riskLevel (LOW/MODERATE/ELEVATED), employabilityScore (0–100), primaryFactors[], advisorySummary</td><td>No — fully deterministic rule engine</td></tr>
+      <tr><td><code>synthesizeGovernmentPolicyInsights()</code></td><td>metrics, nonPlacementReasons[], districtBreakdown[]</td><td>PolicyRecommendationItem[] (up to 4)</td><td>No — rule-based synthesis</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#57606a;margin-top:6px"><strong>Taxonomy covers 7 industry roles:</strong> Full Stack Web Developer, Data Analyst &amp; BI Specialist, Solar PV Installation Technician, CNC Machine Operator, Healthcare Nursing Assistant, Digital Marketing &amp; E-Commerce Associate, Electrician &amp; Power Maintenance Technician.</p>
+
+  
+  <h2>8. WHAT EXISTS vs. WHAT IS MISSING</h2>
+
+  <h3>Fully Implemented ✅</h3>
+  <ul>
+    <li>End-to-end trainee lifecycle: profile → skills → training → certification → jobs → employment → follow-ups</li>
+    <li>Employer verification queue with server actions (verify/reject)</li>
+    <li>Job posting, skill requirements, trainee application with match scoring</li>
+    <li>30/90/180/365-day longitudinal follow-up engine</li>
+    <li>AI skill gap analysis with deterministic fallback</li>
+    <li>AI career coach (next-best-action engine)</li>
+    <li>Government admin macro analytics: retention curves, wage progression, district rankings, non-placement pie</li>
+    <li>CSV export for GOVERNMENT_ADMIN</li>
+    <li>Consent management (grant/revoke) + full audit log</li>
+    <li>Non-placement root cause tracking</li>
+    <li>SkillEvidence system with confidence levels</li>
+    <li>Career timeline page (full chronological with year grouping)</li>
+    <li>Certification wallet with 6-step verification status</li>
+    <li>External profile linking (GitHub, LinkedIn, LeetCode, etc.) — UI exists in identity page</li>
+    <li>Self-employment ventures recording</li>
+    <li>Apprenticeship record tracking</li>
+    <li>Real-time analytics from DB (no fake data guards throughout)</li>
+  </ul>
+
+  <h3>Gaps / Missing or Incomplete 🔴</h3>
+  <ul>
+    <li><strong>Quick Demo Access panel</strong> — must be removed for production; contains hardcoded seed emails/password</li>
+    <li><strong>NEXTAUTH_SECRET hardcoded fallback</strong> — must be env-only; current fallback is predictable</li>
+    <li><strong>Admin authorization code fallback</strong> — "CAREERLOOP-GOV-ADMIN" is in source code; must be env-only</li>
+    <li><strong>ApprenticeshipRecord UI</strong> — no add-apprenticeship form exists (only display in outcomes page if records already exist in DB); trainee cannot self-report apprenticeship through UI</li>
+    <li><strong>Trainee outcomes page</strong> — has self-employment form but NO apprenticeship add form</li>
+    <li><strong>External profile GitHub/LinkedIn sync</strong> — UI exists for input/display; actual OAuth token sync / API fetching NOT implemented (rawData is cached but no sync endpoint)</li>
+    <li><strong>Provider portal depth</strong> — programs page exists but batch enrollment, assessment logging, and certification issuance from provider side not audited in depth</li>
+    <li><strong>Admin skills page</strong> — full skill taxonomy management (UI exists) but skill addition from admin not confirmed working</li>
+    <li><strong>Password reset / forgot password</strong> — not implemented</li>
+    <li><strong>Email notifications</strong> — follow-up scheduling, milestone alerts — no email provider configured</li>
+    <li><strong>Employer candidates page</strong> — exists but not deeply audited</li>
+    <li><strong>Policy Recommendation DB model</strong> — exists in schema but no CRUD UI to save/manage persistent recommendations; only in-memory synthesized on demand</li>
+    <li><strong>AIInsight model</strong> — defined in schema but never written to in any code path (unused)</li>
+    <li><strong>CompensationHistory model</strong> — defined but never written to; no wage history tracking page</li>
+    <li><strong>Trainee date-of-birth / gender</strong> — fields in DB but no collection UI (only district, phone, education in profile form)</li>
+    <li><strong>Seed file (<code>prisma/seed.js</code>)</strong> — referenced in package.json scripts but not audited; assumed to contain the demo accounts</li>
+  </ul>
+
+  
+  <h2>9. SPECIFIC TRANSFORMATION GAPS</h2>
+  <table>
+    <thead><tr><th>Area</th><th>Current State</th><th>Gap / Action Required</th></tr></thead>
+    <tbody>
+      <tr class="gap-row"><td>Demo Access Panel</td><td>4 hardcoded demo users on signin page</td><td>Remove <code>handleQuickLogin()</code> and "Quick Demo Access" panel entirely for production</td></tr>
+      <tr class="gap-row"><td>Auth Security</td><td>NEXTAUTH_SECRET has predictable in-code fallback; admin code in source</td><td>Require env vars; throw error if missing in production</td></tr>
+      <tr class="gap-row"><td>Apprenticeship Recording</td><td>Display exists, add form missing</td><td>Add server action + form on <code>/trainee/outcomes</code> for apprenticeship records</td></tr>
+      <tr class="gap-row"><td>External Profile Sync</td><td>URL/username input UI exists; no API sync</td><td>Implement GitHub API fetch + cache in rawData field</td></tr>
+      <tr class="gap-row"><td>AI Insight Persistence</td><td>AIInsight model exists, never used</td><td>Write insights to DB from analyzeSkillGap/evaluateRisk for audit trail</td></tr>
+      <tr class="gap-row"><td>Policy Recommendations DB</td><td>PolicyRecommendation model exists, unused</td><td>Persist synthesized insights; allow admin to change status (OPEN→UNDER_REVIEW→IMPLEMENTED)</td></tr>
+      <tr class="gap-row"><td>Wage History</td><td>CompensationHistory model exists, never written</td><td>Log compensation on each employment update or follow-up submission</td></tr>
+      <tr class="gap-row"><td>Provider Enrollment Flow</td><td>Programs exist; enrollment admin needs validation</td><td>Provider should be able to add trainee enrollments from their side</td></tr>
+      <tr class="gap-row"><td>Trainee DOB/Gender</td><td>Fields in DB, no UI collection</td><td>Add DOB and gender fields to profile/onboarding</td></tr>
+      <tr class="gap-row"><td>Email Notifications</td><td>Not implemented</td><td>Add Nodemailer/Resend integration for follow-up milestone reminders</td></tr>
+      <tr class="gap-row"><td>Industry Role Taxonomy</td><td>Only 7 roles defined</td><td>Expand INDUSTRY_ROLE_TAXONOMY for more vocational sectors (Beauty &amp; Wellness, Textile, Construction, etc.)</td></tr>
+      <tr class="gap-row"><td>SQLite for Production</td><td>SQLite used (file-based)</td><td>Migrate to PostgreSQL for production deployment; Prisma schema change is minimal</td></tr>
+    </tbody>
+  </table>
+
+  
+  <h2>10. CSS DESIGN SYSTEM SUMMARY</h2>
+  <p>Custom CSS variables: <code>--background #FBFBFA</code>, <code>--primary #0A5C36</code>, <code>--muted #526661</code>, <code>--border #E6EBE8</code>. Custom Tailwind colors: charcoal (900–500), emerald (900–50), sage (50–500), amber (50–500). Custom shadows: soft, card, elevated, glow, dome. Glassmorphism utilities: <code>.glass-pill</code>, <code>.glass-card</code>. Ambient dome/top lighting via <code>.amra-ambient-dome</code> and <code>.amra-ambient-top</code> CSS classes.</p>
+
+  <footer>
+    <p>Made with IBM Bob</p>
+  </footer>
+</div>
+</body>
+</html>

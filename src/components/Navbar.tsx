@@ -36,10 +36,9 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { label: "PLATFORM", href: "/" },
     { label: "HOW IT WORKS", href: "/how-it-works" },
     { label: "ARCHITECTURE", href: "/architecture" },
-    { label: "PRIVACY & TRUST", href: "/privacy" },
+    { label: "PRIVACY", href: "/privacy" },
   ];
 
   return (

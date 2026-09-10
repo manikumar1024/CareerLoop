@@ -96,24 +96,35 @@ export default async function TraineeTrainingPage() {
 
                     {/* Step 2: Attended */}
                     <div className="p-3 rounded-xl bg-white border border-border space-y-1">
-                      <div className="flex items-center gap-1.5 font-bold text-emerald-800">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      <div className={`flex items-center gap-1.5 font-bold ${enrollment.attendancePercentage !== null && enrollment.attendancePercentage !== undefined ? "text-emerald-800" : "text-muted"}`}>
+                        {enrollment.attendancePercentage !== null && enrollment.attendancePercentage !== undefined
+                          ? <CheckCircle2 className="w-3.5 h-3.5" />
+                          : <Clock className="w-3.5 h-3.5" />
+                        }
                         <span>2. Attended</span>
                       </div>
-                      <p className="font-bold text-charcoal-800">{enrollment.attendancePercentage}% Attendance</p>
+                      <p className="font-bold text-charcoal-800">
+                        {enrollment.attendancePercentage !== null && enrollment.attendancePercentage !== undefined
+                          ? `${enrollment.attendancePercentage}%`
+                          : "Not recorded"}
+                      </p>
                       <p className="text-[10px] text-muted">Min {enrollment.program.minHours} Practical Hours</p>
                     </div>
 
                     {/* Step 3: Assessed */}
                     <div className="p-3 rounded-xl bg-white border border-border space-y-1">
-                      <div className="flex items-center gap-1.5 font-bold text-emerald-800">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      <div className={`flex items-center gap-1.5 font-bold ${assessment ? "text-emerald-800" : "text-muted"}`}>
+                        {assessment ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
                         <span>3. Assessed</span>
                       </div>
                       <p className="font-bold text-charcoal-800">
-                        {assessment ? `${assessment.scoreObtained}/${assessment.maxScore} Score` : "Pending Assessment"}
+                        {assessment ? `${assessment.scoreObtained}/${assessment.maxScore}` : "Pending"}
                       </p>
-                      <p className="text-[10px] text-muted">Grade: {enrollment.grade || "A"}</p>
+                      <p className="text-[10px] text-muted">
+                        {assessment
+                          ? (assessment.passed ? "Passed" : "Did not pass")
+                          : enrollment.grade ? `Grade: ${enrollment.grade}` : "Not yet assessed"}
+                      </p>
                     </div>
 
                     {/* Step 4: Certified */}
@@ -123,7 +134,9 @@ export default async function TraineeTrainingPage() {
                         <span>4. Certified</span>
                       </div>
                       <p className="font-mono text-[11px] truncate">{cert ? cert.certificateNumber : "In Progress"}</p>
-                      <p className="text-[10px]">{cert ? "Digitally Verified" : "Pending Exam"}</p>
+                      <p className="text-[10px]">
+                        {cert ? cert.verificationStatus.replace(/_/g, " ") : "Pending Exam"}
+                      </p>
                     </div>
 
                   </div>
@@ -148,9 +161,16 @@ export default async function TraineeTrainingPage() {
                         </div>
                       </div>
 
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 shrink-0">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Tamper-Proof Credential</span>
+                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border shrink-0 ${
+                        cert.verificationStatus === "VERIFIED" ? "text-emerald-800 bg-emerald-50 border-emerald-200" :
+                        cert.verificationStatus === "PROVIDER_VERIFIED" ? "text-blue-800 bg-blue-50 border-blue-200" :
+                        "text-amber-800 bg-amber-50 border-amber-200"
+                      }`}>
+                        {cert.verificationStatus === "VERIFIED" || cert.verificationStatus === "PROVIDER_VERIFIED"
+                          ? <CheckCircle2 className="w-3.5 h-3.5" />
+                          : <Clock className="w-3.5 h-3.5" />
+                        }
+                        <span>{cert.verificationStatus.replace(/_/g, " ")}</span>
                       </span>
                     </div>
                   )}

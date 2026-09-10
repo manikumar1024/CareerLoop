@@ -283,30 +283,32 @@ export default async function TraineeFollowupsPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block font-semibold text-charcoal-700 mb-1">
-                      Current Monthly Salary (₹)
-                    </label>
-                    <input
-                      type="number"
-                      name="currentSalary"
-                      defaultValue={latestEmployment?.monthlySalary ? Math.round(latestEmployment.monthlySalary * 1.1) : 28000}
-                      className="w-full px-3 py-2 rounded-xl border border-border bg-white font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-charcoal-700 mb-1">
-                      Wage Increase %
-                    </label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      name="wageIncreasePercent"
-                      defaultValue={10.0}
-                      className="w-full px-3 py-2 rounded-xl border border-border bg-white"
-                    />
-                  </div>
-                </div>
+                   <div>
+                     <label className="block font-semibold text-charcoal-700 mb-1">
+                       Current Monthly Salary (₹)
+                     </label>
+                     <input
+                       type="number"
+                       name="currentSalary"
+                       defaultValue={latestEmployment?.monthlySalary || ""}
+                       placeholder="Enter current monthly salary"
+                       className="w-full px-3 py-2 rounded-xl border border-border bg-white font-medium"
+                     />
+                   </div>
+                   <div>
+                     <label className="block font-semibold text-charcoal-700 mb-1">
+                       Wage Increase % (if any)
+                     </label>
+                     <input
+                       type="number"
+                       step="0.1"
+                       name="wageIncreasePercent"
+                       defaultValue=""
+                       placeholder="e.g. 12.5"
+                       className="w-full px-3 py-2 rounded-xl border border-border bg-white"
+                     />
+                   </div>
+                 </div>
 
                 <div>
                   <label className="block font-semibold text-charcoal-700 mb-1">

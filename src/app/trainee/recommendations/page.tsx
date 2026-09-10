@@ -31,12 +31,13 @@ export default async function TraineeRecommendationsPage({
     where: { userId: user.id },
     include: {
       skills: { include: { skill: true } },
+      careerTarget: true,
     },
   });
 
   if (!trainee) return null;
 
-  const selectedRole = searchParams.role || trainee.targetRole || "Full Stack Web Developer";
+  const selectedRole = searchParams.role || trainee.careerTarget?.targetRole || "Full Stack Web Developer";
   const traineeSkillsFormatted = trainee.skills.map((s) => ({
     name: s.skill.name,
     proficiency: s.proficiencyLevel,
