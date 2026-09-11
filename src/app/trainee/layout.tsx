@@ -29,14 +29,23 @@ export default async function TraineeLayout({
     redirect(roleRedirects[user.role] || "/login/student");
   }
 
-  // If the user has no trainee profile yet, send them through onboarding
-  const traineeProfile = await prisma.traineeProfile.findUnique({
+  // If the user has no trainee profile yet, auto-provision one so they can access their workspace
+  let traineeProfile = await prisma.traineeProfile.findUnique({
     where: { userId: user.id },
     select: { id: true },
   });
 
   if (!traineeProfile) {
-    redirect("/onboarding");
+    const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+    traineeProfile = await prisma.traineeProfile.create({
+      data: {
+        userId: user.id,
+        traineeId: `CLP-2026-${randomSuffix}`,
+        district: "National",
+        state: "National",
+      },
+      select: { id: true },
+    });
   }
 
   return (

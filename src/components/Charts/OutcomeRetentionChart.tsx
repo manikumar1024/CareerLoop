@@ -34,38 +34,38 @@ export default function OutcomeRetentionChart({ data }: OutcomeRetentionChartPro
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="retentionGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#0A5C36" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#0A5C36" stopOpacity={0.0} />
+              <stop offset="5%" stopColor="#442718" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="#442718" stopOpacity={0.0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6EBE8" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5DCCD" />
           <XAxis
             dataKey="milestone"
-            tick={{ fontSize: 11, fill: "#526661" }}
-            axisLine={{ stroke: "#E6EBE8" }}
+            tick={{ fontSize: 11, fill: "#786153" }}
+            axisLine={{ stroke: "#E5DCCD" }}
             tickLine={false}
           />
           <YAxis
             domain={[0, 100]}
             unit="%"
-            tick={{ fontSize: 11, fill: "#526661" }}
+            tick={{ fontSize: 11, fill: "#786153" }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
             formatter={(val: any) => [`${val}% Retained`, "Retention Rate"]}
             contentStyle={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "#FDFCF9",
               borderRadius: "12px",
-              border: "1px solid #E6EBE8",
+              border: "1px solid #E5DCCD",
               fontSize: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              boxShadow: "0 4px 12px rgba(42,28,21,0.06)",
             }}
           />
           <Area
             type="monotone"
             dataKey="rate"
-            stroke="#0A5C36"
+            stroke="#442718"
             strokeWidth={2.5}
             fillOpacity={1}
             fill="url(#retentionGradient)"

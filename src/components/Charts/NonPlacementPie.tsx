@@ -18,7 +18,7 @@ interface NonPlacementPieProps {
   }[];
 }
 
-const COLORS = ["#0A5C36", "#E08A26", "#3B82F6", "#8B5CF6", "#EC4899", "#64748B", "#F59E0B"];
+const COLORS = ["#442718", "#78472E", "#B86B30", "#965C3D", "#C4792C", "#BAA78E", "#5D3723"];
 
 export default function NonPlacementPie({ data }: NonPlacementPieProps) {
   if (!data || data.length === 0) {
@@ -53,11 +53,11 @@ export default function NonPlacementPie({ data }: NonPlacementPieProps) {
               name,
             ]}
             contentStyle={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "#FDFCF9",
               borderRadius: "12px",
-              border: "1px solid #E6EBE8",
+              border: "1px solid #E5DCCD",
               fontSize: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              boxShadow: "0 4px 12px rgba(42,28,21,0.06)",
             }}
           />
           <Legend

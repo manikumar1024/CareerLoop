@@ -20,7 +20,7 @@ export default function StudentLoginPage() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <RoleLoginForm
-          role="STUDENT"
+          role="TRAINEE"
           title="Student / Trainee Portal"
           subtitle="Access your verified skills, digital credentials, personalized learning roadmap, and career readiness diagnostics."
           destinationUrl="/trainee"

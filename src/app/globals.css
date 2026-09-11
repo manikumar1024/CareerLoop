@@ -5,19 +5,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #FBFBFA;
-  --foreground: #0E1F1C;
-  --primary: #0A5C36;
-  --primary-hover: #08492B;
+  --background: #F7F3EB;
+  --foreground: #2A1C15;
+  --primary: #442718;
+  --primary-hover: #2B180E;
   --primary-foreground: #FFFFFF;
-  --secondary: #F0F6F2;
-  --accent: #E08A26;
-  --muted: #526661;
-  --muted-light: #7F9690;
-  --border: #E6EBE8;
-  --card: #FFFFFF;
-  --card-foreground: #0E1F1C;
-  --sage-bg: #F4F8F6;
+  --secondary: #EFE8DC;
+  --accent: #B86B30;
+  --muted: #786153;
+  --muted-light: #9E8779;
+  --border: #E5DCCD;
+  --card: #FDFCF9;
+  --card-foreground: #2A1C15;
+  --sage-bg: #F4EFE6;
 }
 
 body {
@@ -34,7 +34,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.025em;
 }
 
-/* Amra-inspired Soft Ambient Dome Lighting */
+/* Luxury Beige & Warm Amber Ambient Dome Lighting */
 .amra-ambient-dome {
   position: absolute;
   bottom: -20%;
@@ -45,10 +45,10 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50% 50% 0 0;
   background: radial-gradient(
     ellipse at top,
-    rgba(224, 240, 245, 0.8) 0%,
-    rgba(220, 235, 245, 0.5) 30%,
-    rgba(230, 225, 248, 0.35) 60%,
-    rgba(251, 251, 250, 0) 100%
+    rgba(244, 235, 220, 0.85) 0%,
+    rgba(238, 225, 205, 0.5) 30%,
+    rgba(230, 212, 190, 0.35) 60%,
+    rgba(247, 243, 235, 0) 100%
   );
   filter: blur(40px);
   pointer-events: none;
@@ -65,9 +65,9 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 0 0 50% 50%;
   background: radial-gradient(
     ellipse at bottom,
-    rgba(215, 235, 248, 0.4) 0%,
-    rgba(235, 245, 240, 0.2) 60%,
-    rgba(251, 251, 250, 0) 100%
+    rgba(242, 230, 212, 0.45) 0%,
+    rgba(247, 240, 228, 0.25) 60%,
+    rgba(247, 243, 235, 0) 100%
   );
   filter: blur(50px);
   pointer-events: none;
@@ -76,17 +76,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphism floating pills */
 .glass-pill {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(253, 251, 247, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(230, 235, 232, 0.9);
+  border: 1px solid rgba(229, 220, 205, 0.9);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(253, 251, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid #E6EBE8;
+  border: 1px solid #E5DCCD;
+}
+
+/* Warm ivory-beige surface treatment for cards & panels */
+.bg-white {
+  background-color: #FDFCF9 !important;
 }
 
 /* Smooth micro-interactions */
@@ -103,14 +108,14 @@ h1, h2, h3, h4, h5, h6 {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F7F5;
+  background: #F4EFE6;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBDAD2;
+  background: #D8C9B3;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A6C2B4;
+  background: #BAA78E;
 }
 
 @media (prefers-reduced-motion: reduce) {

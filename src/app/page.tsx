@@ -26,7 +26,28 @@ import {
 export const revalidate = 0; // Fresh real-time data from database
 
 export default async function HomePage() {
-  const metrics = await getLongitudinalOverview();
+  let metrics;
+  try {
+    metrics = await getLongitudinalOverview();
+  } catch (err) {
+    console.error("HomePage metrics fetch error:", err);
+    metrics = {
+      hasData: false,
+      totalTrainees: 0,
+      totalCertified: 0,
+      totalEmployed: 0,
+      totalSelfEmployed: 0,
+      totalApprenticeship: 0,
+      overallEmploymentRate: 0,
+      retention90Days: 0,
+      retention180Days: 0,
+      retention365Days: 0,
+      avgInitialSalary: 0,
+      avgCurrentSalary: 0,
+      avgWageGrowthPercent: 0,
+      avgSkillRelevanceScore: 0,
+    };
+  }
 
   const lifecycleStages = [
     { num: "01", name: "Train", desc: "NSDC / accredited curriculum delivery" },
@@ -55,6 +76,13 @@ export default async function HomePage() {
         ========================================================================= */}
         <section className="pt-12 sm:pt-20 pb-20 px-4 sm:px-8 max-w-7xl mx-auto text-center relative">
           
+          {/* Brand Heading */}
+          <div className="mb-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
+            <span className="font-display font-black text-5xl sm:text-6xl md:text-7xl tracking-tight text-brown-800 select-none">
+              Career<span className="text-brown-500">Loop</span>
+            </span>
+          </div>
+
           {/* Mission Capsule */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill shadow-soft text-xs font-semibold tracking-wider text-charcoal-700 uppercase mb-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
@@ -91,71 +119,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Floating Conceptual Outcome Capsule (Inspired by Bottom-Right Amra Floating Widget) */}
-          <div className="max-w-4xl mx-auto glass-card rounded-3xl p-6 sm:p-8 shadow-card border border-border text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/60">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center font-bold">
-                  CL
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-base text-charcoal-800">
-                    Longitudinal Outcome Tracker
-                  </h3>
-                  <p className="text-xs text-muted">
-                    Continuous follow-up tracking across 30d, 90d, 180d & 365d milestones
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Employer Verified Outcomes</span>
-              </div>
-            </div>
-
-            {/* Metric Snapshot */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6">
-              <div>
-                <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Trainees Tracked</p>
-                <p className="font-display font-bold text-xl sm:text-2xl text-charcoal-800 mt-1">
-                  {metrics.hasData ? metrics.totalTrainees : "—"}
-                </p>
-                <p className="text-[10px] text-muted">Active database records</p>
-              </div>
-
-              <div>
-                <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Employment Rate</p>
-                <p className="font-display font-bold text-xl sm:text-2xl text-emerald-700 mt-1">
-                  {metrics.hasData ? `${metrics.overallEmploymentRate}%` : "—"}
-                </p>
-                <p className="text-[10px] text-muted">Verified & self-reported</p>
-              </div>
-
-              <div>
-                <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">6-Month Retention</p>
-                <p className="font-display font-bold text-xl sm:text-2xl text-charcoal-800 mt-1">
-                  {metrics.hasData ? `${metrics.retention180Days}%` : "—"}
-                </p>
-                <p className="text-[10px] text-muted">180-day milestone survival</p>
-              </div>
-
-              <div>
-                <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Avg Monthly Wage</p>
-                <p className="font-display font-bold text-xl sm:text-2xl text-charcoal-800 mt-1">
-                  {metrics.hasData ? formatCurrency(metrics.avgCurrentSalary) : "—"}
-                </p>
-                <p className="text-[10px] text-muted">+{metrics.avgWageGrowthPercent}% progression</p>
-              </div>
-            </div>
-
-            {!metrics.hasData && (
-              <div className="mt-4 p-3 rounded-xl bg-sage-50 border border-sage-200 text-xs text-muted flex items-center justify-between">
-                <span>Currently in clean database mode. Run seed script for sample test cohorts.</span>
-                <span className="font-mono text-[10px] text-emerald-800 bg-white px-2 py-0.5 rounded border border-border">npm run db:seed</span>
-              </div>
-            )}
-          </div>
 
         </section>
 

@@ -58,13 +58,23 @@ export const authOptions: NextAuthOptions = {
             ? await bcrypt.hash(credentials.password, 10) 
             : await bcrypt.hash("CareerLoop2026!", 10);
 
+          const isTrainee = role === "TRAINEE" || role === "STUDENT";
           user = await prisma.user.create({
             data: {
               email,
               name: email.split("@")[0].replace(".", " ").replace(/\b\w/g, l => l.toUpperCase()),
               passwordHash: hashedPassword,
-              role,
+              role: role === "STUDENT" ? "TRAINEE" : role,
               adminApproved: role === "GOVERNMENT_ADMIN" || role === "ADMINISTRATOR" ? true : false,
+              ...(isTrainee ? {
+                traineeProfile: {
+                  create: {
+                    traineeId: `CLP-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+                    district: "National",
+                    state: "National",
+                  },
+                },
+              } : {}),
             },
             include: {
               traineeProfile: true,

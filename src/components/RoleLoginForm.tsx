@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 interface RoleLoginFormProps {
-  role: "STUDENT" | "TRAINER" | "TRAINING_PROVIDER" | "EMPLOYER" | "GOVERNMENT_ADMIN" | "ADMINISTRATOR";
+  role: "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "EMPLOYER" | "GOVERNMENT_ADMIN" | "ADMINISTRATOR";
   title: string;
   subtitle: string;
   destinationUrl: string;
@@ -29,7 +29,7 @@ interface RoleLoginFormProps {
 }
 
 const ROLE_ICONS = {
-  STUDENT: GraduationCap,
+  TRAINEE: GraduationCap,
   TRAINER: BookOpen,
   TRAINING_PROVIDER: AwardIcon,
   EMPLOYER: Building2,
@@ -86,17 +86,7 @@ export default function RoleLoginForm({
         setError(res.error);
         setLoading(false);
       } else {
-        if (role === "STUDENT") {
-          const check = await fetch("/api/trainee/profile-complete");
-          const data = await check.json();
-          if (!data.complete) {
-            router.push("/onboarding");
-          } else {
-            router.push(destinationUrl);
-          }
-        } else {
-          router.push(destinationUrl);
-        }
+        router.push(destinationUrl);
         router.refresh();
       }
     } catch (err: any) {
