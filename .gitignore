@@ -8,3 +8,4 @@ out/
 .env.production.local
 *.log
 prisma/dev.db
+public/uploads/

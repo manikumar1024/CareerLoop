@@ -16,15 +16,13 @@ export default async function AdminLayout({
     redirect("/login/admin");
   }
 
-  // Strict role check: Government Admin or Platform Administrator only
-  if (user.role !== "GOVERNMENT_ADMIN" && user.role !== "ADMINISTRATOR") {
+  if (user.role !== "GOVERNMENT_ADMIN") {
     const roleRedirects: Record<string, string> = {
       TRAINEE: "/trainee",
-      TRAINER: "/trainer",
       TRAINING_PROVIDER: "/provider",
       EMPLOYER: "/employer",
     };
-    redirect(roleRedirects[user.role] || "/login/admin");
+    redirect(roleRedirects[user.role] || "/login");
   }
 
   return (

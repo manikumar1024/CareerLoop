@@ -27,7 +27,10 @@ import {
   ArrowLeft,
   Layers,
   BriefcaseIcon,
-  ScrollText
+  ScrollText,
+  BookMarked,
+  FileCheck,
+  Trophy
 } from "lucide-react";
 
 interface SidebarItem {
@@ -39,7 +42,7 @@ interface SidebarItem {
 }
 
 interface DashboardSidebarProps {
-  role: "TRAINEE" | "STUDENT" | "TRAINER" | "EMPLOYER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "ADMINISTRATOR";
+  role: "TRAINEE" | "STUDENT" | "EMPLOYER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN";
   title: string;
   userEmail?: string;
 }
@@ -60,6 +63,9 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
           { label: "Career Identity", href: "/trainee/identity", icon: Award },
           { label: "Training", href: "/trainee/training", icon: GraduationCap },
           { label: "Certifications", href: "/trainee/certifications", icon: Award },
+          { label: "Daily Practice Exam", href: "/trainee/daily-exam", icon: Trophy },
+          { label: "Communication Skills", href: "/trainee/communication", icon: MessageSquare },
+          { label: "My Certificates", href: "/trainee/certificates", icon: FileCheck },
           { label: "Jobs", href: "/trainee/jobs", icon: Briefcase },
           { label: "Applications", href: "/trainee/applications", icon: ClipboardList },
           { label: "Employment", href: "/trainee/outcomes", icon: BriefcaseIcon },
@@ -69,14 +75,6 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
           { label: "Settings & Consent", href: "/trainee/settings", icon: Settings },
         ];
 
-      case "TRAINER":
-        return [
-          { label: "Dashboard", href: "/trainer", icon: Home },
-          { label: "Assigned Batches", href: "/trainer/batches", icon: BookOpen },
-          { label: "Learners Roster", href: "/trainer/learners", icon: Users },
-          { label: "Assessments", href: "/trainer/assessments", icon: Award },
-          { label: "Trainer Profile", href: "/trainer/profile", icon: User },
-        ];
 
       case "EMPLOYER":
         return [
@@ -96,11 +94,11 @@ export default function DashboardSidebar({ role, title, userEmail }: DashboardSi
           { label: "Overview", href: "/provider", icon: Home },
           { label: "Programs & Batches", href: "/provider/programs", icon: BookOpen },
           { label: "Placement & Outcomes", href: "/provider/outcomes", icon: Briefcase },
+          { label: "Certificate Verification", href: "/provider/certificates", icon: FileCheck },
           { label: "Outcome Analytics", href: "/provider/analytics", icon: BarChart3 },
         ];
 
       case "GOVERNMENT_ADMIN":
-      case "ADMINISTRATOR":
         return [
           { label: "Executive Overview", href: "/admin", icon: Home },
           { label: "Policy Simulator", href: "/admin/simulator", icon: Target },

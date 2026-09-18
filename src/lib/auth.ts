@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 
-export type UserRole = "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER" | "ADMINISTRATOR";
+export type UserRole = "TRAINEE" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -100,9 +100,7 @@ export const authOptions: NextAuthOptions = {
             (expected === "STUDENT" && actual === "TRAINEE") ||
             (expected === "TRAINEE" && actual === "STUDENT") ||
             (expected === "PROVIDER" && actual === "TRAINING_PROVIDER") ||
-            (expected === "GOVERNMENT" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR")) ||
-            (expected === "ADMIN" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR")) ||
-            (expected === "ADMINISTRATOR" && (actual === "GOVERNMENT_ADMIN" || actual === "ADMINISTRATOR"));
+            (expected === "GOVERNMENT" && actual === "GOVERNMENT_ADMIN");
 
           if (!isMatch) {
             throw new Error(
@@ -165,7 +163,7 @@ export async function getCurrentUser() {
     email: string;
     name?: string;
     image?: string;
-    role: "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER" | "ADMINISTRATOR";
+    role: "TRAINEE" | "TRAINING_PROVIDER" | "GOVERNMENT_ADMIN" | "EMPLOYER";
     adminApproved: boolean;
   } | null;
 }

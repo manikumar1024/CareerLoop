@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,14 +21,19 @@ model User {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
-  accounts         Account[]
-  sessions         Session[]
-  traineeProfile   TraineeProfile?
-  employerProfile  EmployerProfile?
-  providerProfile  TrainingProviderProfile?
-  trainerProfile   TrainerProfile?
-  auditLogs        AuditLog[]
-  consentRecords   ConsentRecord[]
+  accounts              Account[]
+  sessions              Session[]
+  traineeProfile        TraineeProfile?
+  employerProfile       EmployerProfile?
+  providerProfile       TrainingProviderProfile?
+  trainerProfile        TrainerProfile?
+  auditLogs             AuditLog[]
+  consentRecords        ConsentRecord[]
+  examAttempts          ExamAttempt[]
+  commAttempts          CommunicationAttempt[]
+  vocabProgress         UserVocabularyProgress[]
+  uploadedCertificates  Certificate[]            @relation("StudentCertificates")
+  reviewedCertificates  Certificate[]            @relation("ReviewedCertificates")
 }
 
 model Account {
@@ -664,3 +669,148 @@ model AuditLog {
 
   user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
+
+// ─── DAILY PRACTICE EXAM ──────────────────────────────────────────────────
+
+model DailyExam {
+  id            String         @id @default(cuid())
+  title         String
+  role          String         // e.g. "Software Developer", "Data Analyst"
+  difficulty    String         @default("MEDIUM") // EASY, MEDIUM, HARD
+  date          String         // YYYY-MM-DD unique per role per day
+  timeLimit     Int            @default(15) // minutes
+  questionCount Int            @default(10)
+  createdAt     DateTime       @default(now())
+
+  questions     ExamQuestion[]
+  attempts      ExamAttempt[]
+
+  @@unique([role, date])
+}
+
+model ExamQuestion {
+  id            String      @id @default(cuid())
+  examId        String
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String      // "A", "B", "C", or "D"
+  explanation   String
+  topic         String
+  difficulty    String      @default("MEDIUM")
+  orderIndex    Int         @default(0)
+
+  exam          DailyExam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers       ExamAnswer[]
+}
+
+model ExamAttempt {
+  id          String       @id @default(cuid())
+  userId      String
+  examId      String
+  score       Int          // raw score out of questionCount
+  percentage  Float
+  timeTaken   Int          // seconds
+  passed      Boolean      @default(false)
+  completedAt DateTime     @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exam        DailyExam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers     ExamAnswer[]
+
+  @@unique([userId, examId]) // one attempt per exam per user
+}
+
+model ExamAnswer {
+  id             String       @id @default(cuid())
+  attemptId      String
+  questionId     String
+  selectedAnswer String?      // "A", "B", "C", "D", or null if unanswered
+  isCorrect      Boolean      @default(false)
+
+  attempt        ExamAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question       ExamQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+// ─── COMMUNICATION SKILLS ─────────────────────────────────────────────────
+
+model CommunicationActivity {
+  id          String                  @id @default(cuid())
+  title       String
+  type        String                  // GRAMMAR, VOCABULARY, READING, WRITING, INTERVIEW
+  difficulty  String                  @default("MEDIUM")
+  content     String                  // JSON string: question/passage/prompt data
+  dayNumber   Int?                    // for daily challenge sequencing
+  createdAt   DateTime                @default(now())
+
+  attempts    CommunicationAttempt[]
+}
+
+model CommunicationAttempt {
+  id           String                @id @default(cuid())
+  userId       String
+  activityId   String
+  score        Float?
+  feedback     String?               // JSON: grammarScore, clarityScore, suggestions etc.
+  response     String?               // student's written/selected answer
+  completedAt  DateTime              @default(now())
+
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity     CommunicationActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model VocabularyWord {
+  id          String                  @id @default(cuid())
+  word        String                  @unique
+  meaning     String
+  example     String
+  synonyms    String?                 // comma-separated
+  antonyms    String?                 // comma-separated
+  difficulty  String                  @default("MEDIUM") // EASY, MEDIUM, HARD
+  category    String?                 // e.g. "Business", "Academic", "General"
+  createdAt   DateTime                @default(now())
+
+  userProgress UserVocabularyProgress[]
+}
+
+model UserVocabularyProgress {
+  id           String         @id @default(cuid())
+  userId       String
+  wordId       String
+  status       String         @default("NEW")  // NEW, LEARNING, LEARNED, BOOKMARKED
+  lastReviewed DateTime?
+  createdAt    DateTime       @default(now())
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word         VocabularyWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+}
+
+// ─── STUDENT CERTIFICATES (externally obtained) ───────────────────────────
+
+model Certificate {
+  id                   String    @id @default(cuid())
+  studentId            String    // references User.id
+  certificateName      String
+  courseName           String
+  issuingOrganization  String
+  certificateExternalId String?  // optional external cert ID
+  issueDate            DateTime
+  expiryDate           DateTime?
+  fileUrl              String?   // relative path to uploaded file
+  fileName             String?
+  fileSize             Int?      // bytes
+  status               String    @default("PENDING") // PENDING, APPROVED, REJECTED, RESUBMIT
+  reviewerId           String?   // references User.id (Training Provider user)
+  reviewerComments     String?
+  uploadedAt           DateTime  @default(now())
+  reviewedAt           DateTime?
+  description          String?
+
+  student              User      @relation("StudentCertificates", fields: [studentId], references: [id], onDelete: Cascade)
+  reviewer             User?     @relation("ReviewedCertificates", fields: [reviewerId], references: [id], onDelete: SetNull)
+}
+

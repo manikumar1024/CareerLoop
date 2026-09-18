@@ -21,20 +21,18 @@ import {
 } from "lucide-react";
 
 interface RoleLoginFormProps {
-  role: "TRAINEE" | "TRAINER" | "TRAINING_PROVIDER" | "EMPLOYER" | "GOVERNMENT_ADMIN" | "ADMINISTRATOR";
+  role: "TRAINEE" | "TRAINING_PROVIDER" | "EMPLOYER" | "GOVERNMENT_ADMIN";
   title: string;
   subtitle: string;
   destinationUrl: string;
   badgeLabel: string;
 }
 
-const ROLE_ICONS = {
+const ROLE_ICONS: Record<string, any> = {
   TRAINEE: GraduationCap,
-  TRAINER: BookOpen,
   TRAINING_PROVIDER: AwardIcon,
   EMPLOYER: Building2,
   GOVERNMENT_ADMIN: Landmark,
-  ADMINISTRATOR: ShieldAlert,
 };
 
 function AwardIcon(props: any) {
@@ -65,7 +63,7 @@ export default function RoleLoginForm({
     setError(null);
     setLoading(true);
 
-    if (mode === "register" && (role === "GOVERNMENT_ADMIN" || role === "ADMINISTRATOR")) {
+    if (mode === "register" && role === "GOVERNMENT_ADMIN") {
       const validCode = process.env.NEXT_PUBLIC_ADMIN_CODE || "CAREERLOOP-GOV-ADMIN";
       if (adminCode.trim() !== validCode) {
         setError("Invalid Administrative Authorization Code. Please contact your department lead.");
@@ -202,7 +200,7 @@ export default function RoleLoginForm({
             </div>
           </div>
 
-          {mode === "register" && (role === "GOVERNMENT_ADMIN" || role === "ADMINISTRATOR") && (
+          {mode === "register" && role === "GOVERNMENT_ADMIN" && (
             <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5">
               <label className="block text-xs font-bold text-amber-900">
                 Departmental Authorization Key

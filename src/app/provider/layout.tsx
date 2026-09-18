@@ -20,12 +20,10 @@ export default async function ProviderLayout({
   if (user.role !== "TRAINING_PROVIDER") {
     const roleRedirects: Record<string, string> = {
       TRAINEE: "/trainee",
-      TRAINER: "/trainer",
       EMPLOYER: "/employer",
       GOVERNMENT_ADMIN: "/admin",
-      ADMINISTRATOR: "/admin",
     };
-    redirect(roleRedirects[user.role] || "/login/provider");
+    redirect(roleRedirects[user.role] || "/login");
   }
 
   return (

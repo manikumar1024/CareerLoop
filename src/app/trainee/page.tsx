@@ -425,6 +425,69 @@ export default async function TraineeDashboardPage() {
         )}
       />
 
+      {/* ── Daily Practice & Upskilling Hub Cards ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link
+          href="/trainee/daily-exam"
+          className="group bg-gradient-to-br from-amber-50/80 to-amber-100/40 p-5 rounded-3xl border border-amber-200/80 shadow-xs hover:shadow-md hover:border-amber-400 transition-all flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-2xl bg-amber-800 text-white flex items-center justify-center font-bold">
+              <Award className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-stone-900 text-base group-hover:text-amber-900 transition-colors">
+              Daily Practice Exam
+            </h4>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              10 role-tailored technical & aptitude questions daily to build test streaks and career readiness.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 mt-4 group-hover:translate-x-0.5 transition-transform">
+            Take Today's Exam <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+        </Link>
+
+        <Link
+          href="/trainee/communication"
+          className="group bg-gradient-to-br from-emerald-50/80 to-emerald-100/40 p-5 rounded-3xl border border-emerald-200/80 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center font-bold">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-stone-900 text-base group-hover:text-emerald-900 transition-colors">
+              Communication Skills
+            </h4>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              Vocabulary builder, grammar precision, workplace email simulation, and STAR interview coaching.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 mt-4 group-hover:translate-x-0.5 transition-transform">
+            Start Daily Session <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+        </Link>
+
+        <Link
+          href="/trainee/certificates"
+          className="group bg-gradient-to-br from-stone-50 to-stone-100/60 p-5 rounded-3xl border border-stone-200 shadow-xs hover:shadow-md hover:border-stone-400 transition-all flex flex-col justify-between"
+        >
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center font-bold">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <h4 className="font-serif font-bold text-stone-900 text-base group-hover:text-stone-950 transition-colors">
+              Verified Certificates
+            </h4>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              Upload course completion certificates and external credentials for official provider verification.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-stone-800 mt-4 group-hover:translate-x-0.5 transition-transform">
+            Manage Portfolio <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+        </Link>
+      </div>
+
       {/* Middle grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         

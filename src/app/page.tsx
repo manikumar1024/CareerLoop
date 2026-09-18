@@ -223,107 +223,111 @@ export default async function HomePage() {
         </section>
 
         {/* =========================================================================
-            ROLE HUBS — Trainee, Employer, Provider, Government
+            PORTAL SELECTION — 2x2 Grid, Polished Cards
         ========================================================================= */}
-        <section className="py-16 px-4 sm:px-8 max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="font-display font-bold text-2xl sm:text-4xl text-charcoal-800 tracking-tight mb-3">
-              Unified Civic-Tech Ecosystem
+        <section className="py-20 px-4 sm:px-8 max-w-5xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-charcoal-100 text-charcoal-600 text-xs font-semibold uppercase tracking-wider mb-4">
+              <Layers className="w-3.5 h-3.5" />
+              <span>Authorized Access</span>
+            </div>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl text-charcoal-800 tracking-tight mb-3">
+              Select Your Portal
             </h2>
-            <p className="text-xs sm:text-sm text-muted">
-              Built for all key participants in the national skilling and livelihood economy.
+            <p className="text-sm text-muted leading-relaxed">
+              Access your dedicated workspace based on your authorized role within the CareerLoop AI platform.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Trainee Card */}
-            <div className="bg-white rounded-3xl p-6 border border-border shadow-card flex flex-col justify-between">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            {/* Student & Trainee */}
+            <Link
+              href="/login/student"
+              className="group bg-white rounded-3xl p-7 border border-border shadow-card flex flex-col justify-between hover:shadow-elevated hover:border-emerald-200 transition-all duration-300 hover:-translate-y-1"
+            >
               <div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center mb-4">
-                  <GraduationCap className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-5 group-hover:bg-emerald-100 transition-colors">
+                  <GraduationCap className="w-6 h-6" />
                 </div>
-                <h3 className="font-display font-bold text-base text-charcoal-800 mb-2">
-                  Trainee Portal
+                <h3 className="font-display font-bold text-lg text-charcoal-800 mb-2">
+                  Student & Trainee Portal
                 </h3>
-                <p className="text-xs text-muted leading-relaxed mb-4">
-                  Digital career profile (CLP-XXXX), verifiable credentials, longitudinal career timeline, 30-365d follow-ups, and AI skill gap roadmap.
+                <p className="text-xs text-muted leading-relaxed">
+                  Career profile, skill tracking, daily practice exams, communication skills, certificate management, AI coaching, and placement readiness.
                 </p>
               </div>
-              <Link
-                href="/login/student"
-                className="text-xs font-semibold text-emerald-800 hover:text-emerald-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
-              >
+              <div className="flex items-center gap-1.5 pt-5 mt-5 border-t border-border/50 text-xs font-semibold text-emerald-700 group-hover:text-emerald-800 transition-colors">
                 <span>Access Student Portal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {/* Employer Card */}
-            <div className="bg-white rounded-3xl p-6 border border-border shadow-card flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-800 flex items-center justify-center mb-4">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <h3 className="font-display font-bold text-base text-charcoal-800 mb-2">
-                  Employer Portal
-                </h3>
-                <p className="text-xs text-muted leading-relaxed mb-4">
-                  Two-tier verification queue for employee hiring claims, skill utilization scoring, and retention analytics.
-                </p>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
-              <Link
-                href="/login/employer"
-                className="text-xs font-semibold text-purple-800 hover:text-purple-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
-              >
-                <span>Access Employer Portal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+            </Link>
 
-            {/* Provider Card */}
-            <div className="bg-white rounded-3xl p-6 border border-border shadow-card flex flex-col justify-between">
+            {/* Training Provider */}
+            <Link
+              href="/login/provider"
+              className="group bg-white rounded-3xl p-7 border border-border shadow-card flex flex-col justify-between hover:shadow-elevated hover:border-blue-200 transition-all duration-300 hover:-translate-y-1"
+            >
               <div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center mb-4">
-                  <Award className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
+                  <Award className="w-6 h-6" />
                 </div>
-                <h3 className="font-display font-bold text-base text-charcoal-800 mb-2">
+                <h3 className="font-display font-bold text-lg text-charcoal-800 mb-2">
                   Training Provider Portal
                 </h3>
-                <p className="text-xs text-muted leading-relaxed mb-4">
-                  Program cohort management, assessment logging, completion-to-placement tracking, and longitudinal wage growth insights.
+                <p className="text-xs text-muted leading-relaxed">
+                  Program management, batch tracking, certificate verification, placement-to-outcome reporting, and longitudinal student analytics.
                 </p>
               </div>
-              <Link
-                href="/login/provider"
-                className="text-xs font-semibold text-blue-800 hover:text-blue-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
-              >
+              <div className="flex items-center gap-1.5 pt-5 mt-5 border-t border-border/50 text-xs font-semibold text-blue-700 group-hover:text-blue-800 transition-colors">
                 <span>Access Provider Portal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
 
-            {/* Government Admin Card */}
-            <div className="bg-white rounded-3xl p-6 border border-border shadow-card flex flex-col justify-between">
+            {/* Employer */}
+            <Link
+              href="/login/employer"
+              className="group bg-white rounded-3xl p-7 border border-border shadow-card flex flex-col justify-between hover:shadow-elevated hover:border-purple-200 transition-all duration-300 hover:-translate-y-1"
+            >
               <div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center mb-4">
-                  <Landmark className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center mb-5 group-hover:bg-purple-100 transition-colors">
+                  <Building2 className="w-6 h-6" />
                 </div>
-                <h3 className="font-display font-bold text-base text-charcoal-800 mb-2">
-                  Government Intelligence
+                <h3 className="font-display font-bold text-lg text-charcoal-800 mb-2">
+                  Employer Hiring Portal
                 </h3>
-                <p className="text-xs text-muted leading-relaxed mb-4">
-                  Macro KPIs, district outcome heatmaps, course ROI comparisons, non-placement root causes, and exportable policy reports.
+                <p className="text-xs text-muted leading-relaxed">
+                  Two-tier credential verification, skill-match hiring queue, candidate management, retention analytics, and verified employment records.
                 </p>
               </div>
-              <Link
-                href="/login/government"
-                className="text-xs font-semibold text-emerald-800 hover:text-emerald-900 flex items-center gap-1.5 pt-3 border-t border-border/50"
-              >
+              <div className="flex items-center gap-1.5 pt-5 mt-5 border-t border-border/50 text-xs font-semibold text-purple-700 group-hover:text-purple-800 transition-colors">
+                <span>Access Employer Portal</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* Government */}
+            <Link
+              href="/login/government"
+              className="group bg-white rounded-3xl p-7 border border-border shadow-card flex flex-col justify-between hover:shadow-elevated hover:border-amber-200 transition-all duration-300 hover:-translate-y-1"
+            >
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-5 group-hover:bg-amber-100 transition-colors">
+                  <Landmark className="w-6 h-6" />
+                </div>
+                <h3 className="font-display font-bold text-lg text-charcoal-800 mb-2">
+                  Government Administration
+                </h3>
+                <p className="text-xs text-muted leading-relaxed">
+                  Macro KPIs, district outcome heatmaps, course ROI analysis, non-placement root causes, and exportable policy intelligence reports.
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 pt-5 mt-5 border-t border-border/50 text-xs font-semibold text-amber-700 group-hover:text-amber-800 transition-colors">
                 <span>Access Government Portal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
 
           </div>
         </section>

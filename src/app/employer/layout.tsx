@@ -20,12 +20,10 @@ export default async function EmployerLayout({
   if (user.role !== "EMPLOYER") {
     const roleRedirects: Record<string, string> = {
       TRAINEE: "/trainee",
-      TRAINER: "/trainer",
       TRAINING_PROVIDER: "/provider",
       GOVERNMENT_ADMIN: "/admin",
-      ADMINISTRATOR: "/admin",
     };
-    redirect(roleRedirects[user.role] || "/login/employer");
+    redirect(roleRedirects[user.role] || "/login");
   }
 
   return (

@@ -20,11 +20,9 @@ export default async function TraineeLayout({
   // Strict role check: Trainee/Student only
   if (user.role !== "TRAINEE") {
     const roleRedirects: Record<string, string> = {
-      TRAINER: "/trainer",
       TRAINING_PROVIDER: "/provider",
       EMPLOYER: "/employer",
       GOVERNMENT_ADMIN: "/admin",
-      ADMINISTRATOR: "/admin",
     };
     redirect(roleRedirects[user.role] || "/login/student");
   }
