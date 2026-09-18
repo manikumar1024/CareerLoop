@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CareerLoop — Seminar Presentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brown-900: #2C1A0E;
+      --brown-800: #3D2314;
+      --brown-700: #5C3317;
+      --brown-600: #7A4020;
+      --brown-500: #8B5E3C;
+      --brown-400: #A67C52;
+      --brown-300: #C4956A;
+      --brown-200: #DDB896;
+      --brown-100: #F0DCC8;
+      --beige-50:  #FAF7F2;
+      --beige-100: #F5EFE6;
+      --beige-200: #EDE3D4;
+      --gold: #C9A84C;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--beige-50);
+      color: var(--brown-900);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* ── PAGE BREAKS ── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 20px;
+      background: white;
+      padding: 18mm 20mm;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(44,26,14,0.12);
+    }
+
+    @media print {
+      body { background: white; }
+      .page {
+        margin: 0;
+        padding: 15mm 18mm;
+        box-shadow: none;
+        page-break-after: always;
+        page-break-inside: avoid;
+      }
+      .no-print { display: none; }
+    }
+
+    /* ── DECORATIVE CORNER ── */
+    .page::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, transparent 50%, var(--beige-100) 50%);
+    }
+
+    /* ── COVER PAGE ── */
+    .cover {
+      background: linear-gradient(160deg, var(--brown-900) 0%, var(--brown-700) 60%, var(--brown-500) 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 297mm;
+      padding: 20mm;
+    }
+    .cover::before { display: none; }
+
+    .cover-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 72px;
+      letter-spacing: -2px;
+      margin-bottom: 6px;
+      color: white;
+    }
+    .cover-logo span { color: var(--brown-300); }
+
+    .cover-tagline {
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--brown-200);
+      margin-bottom: 40px;
+    }
+
+    .cover-divider {
+      width: 80px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px auto;
+    }
+
+    .cover-headline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 26px;
+      max-width: 500px;
+      line-height: 1.4;
+      color: var(--beige-100);
+      margin-bottom: 50px;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .cover-meta-item {
+      text-align: center;
+    }
+    .cover-meta-item .label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brown-300);
+      margin-bottom: 4px;
+    }
+    .cover-meta-item .value {
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .cover-badge {
+      margin-top: 50px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px;
+      padding: 8px 24px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brown-200);
+    }
+
+    .cover-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 30px;
+    }
+    .cover-dots span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--brown-300);
+    }
+    .cover-dots span:nth-child(2) { background: var(--gold); }
+
+    /* ── SECTION HEADERS ── */
+    .section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--brown-400);
+      margin-bottom: 8px;
+    }
+
+    .chapter-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: var(--brown-800);
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .chapter-title span { color: var(--brown-500); }
+
+    .chapter-number {
+      font-family: 'DM Serif Display', serif;
+      font-size: 90px;
+      color: var(--beige-100);
+      position: absolute;
+      top: 14mm;
+      right: 20mm;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .divider {
+      height: 2px;
+      background: linear-gradient(90deg, var(--brown-300), transparent);
+      margin: 14px 0 20px;
+    }
+
+    /* ── STORY TEXT ── */
+    .story p {
+      color: var(--brown-900);
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      line-height: 1.85;
+    }
+    .story p.lead {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--brown-700);
+      font-style: italic;
+      border-left: 3px solid var(--brown-300);
+      padding-left: 14px;
+      margin-bottom: 20px;
+    }
+    .story strong { color: var(--brown-700); font-weight: 600; }
+
+    /* ── QUOTE BLOCKS ── */
+    .quote {
+      background: var(--beige-100);
+      border-left: 4px solid var(--brown-500);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--brown-700);
+    }
+    .quote cite {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brown-400);
+      margin-top: 8px;
+    }
+
+    /* ── ROLE CARDS ── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .role-card {
+      background: var(--beige-50);
+      border: 1px solid var(--beige-200);
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .role-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 60px; height: 60px;
+      background: radial-gradient(circle at bottom right, var(--beige-200), transparent);
+    }
+    .role-card .role-icon {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+    .role-card .role-name {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--brown-800);
+      margin-bottom: 4px;
+    }
+    .role-card .role-desc {
+      font-size: 11px;
+      color: var(--brown-500);
+      line-height: 1.6;
+    }
+
+    /* ── PERSONA BLOCK ── */
+    .persona {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: linear-gradient(135deg, var(--brown-900), var(--brown-700));
+      border-radius: 12px;
+      padding: 18px;
+      margin: 16px 0;
+      color: white;
+    }
+    .persona-avatar {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background: var(--brown-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      border: 2px solid var(--brown-300);
+    }
+    .persona-name {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 2px;
+      color: white;
+    }
+    .persona-role {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brown-300);
+      margin-bottom: 8px;
+    }
+    .persona-story {
+      font-size: 11.5px;
+      line-height: 1.75;
+      color: var(--beige-200);
+    }
+
+    /* ── MILESTONE TIMELINE ── */
+    .timeline {
+      margin: 16px 0;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 22px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--brown-300), var(--beige-200));
+    }
+    .timeline-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .timeline-dot {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: var(--brown-800);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 13px;
+      flex-shrink: 0;
+      border: 3px solid var(--beige-50);
+      z-index: 1;
+    }
+    .timeline-content .t-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brown-400);
+    }
+    .timeline-content .t-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--brown-800);
+    }
+    .timeline-content .t-desc {
+      font-size: 11px;
+      color: var(--brown-500);
+      margin-top: 2px;
+    }
+
+    /* ── FEATURE PILLS ── */
+    .feature-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .feature-pill {
+      background: var(--beige-100);
+      border: 1px solid var(--brown-200);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--brown-700);
+    }
+
+    /* ── STAT CARDS ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .stat-card {
+      background: var(--beige-50);
+      border: 1px solid var(--beige-200);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-card .s-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--brown-700);
+      line-height: 1;
+    }
+    .stat-card .s-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brown-400);
+      margin-top: 4px;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: var(--brown-800);
+      color: white;
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 60px;
+    }
+    .flow-arrow {
+      color: var(--brown-400);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── TECH STACK ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .tech-item {
+      background: var(--beige-100);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tech-item .tech-icon { font-size: 20px; }
+    .tech-item .tech-name { font-weight: 600; font-size: 11px; color: var(--brown-800); }
+    .tech-item .tech-role { font-size: 10px; color: var(--brown-400); }
+
+    /* ── ARCHITECTURE BOX ── */
+    .arch-box {
+      background: var(--brown-900);
+      color: #e8d5b0;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      line-height: 1.8;
+      margin: 14px 0;
+    }
+    .arch-box .arch-comment { color: var(--brown-400); }
+
+    /* ── FINAL PAGE ── */
+    .final-page {
+      background: linear-gradient(160deg, var(--brown-800) 0%, var(--brown-600) 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 297mm;
+    }
+    .final-page::before { display: none; }
+
+    .print-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--brown-800);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(44,26,14,0.4);
+      transition: all 0.2s;
+      z-index: 999;
+    }
+    .print-btn:hover { background: var(--brown-700); transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">🖨️ Save as PDF</button>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-logo">Career<span>Loop</span></div>
+  <div class="cover-tagline">AI-Powered Outcome Intelligence Platform</div>
+  <div class="cover-divider"></div>
+  <div class="cover-headline">"What happens to a trainee after the certificate is handed out?"</div>
+  <div class="cover-divider"></div>
+  <div style="font-size:13px; color: var(--brown-200); max-width: 420px; line-height:1.8; margin-top: 16px;">
+    A story of four stakeholders, one platform, and a mission to ensure every skill translates into a livelihood.
+  </div>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Platform</div>
+      <div class="value">Next.js 14 + AI</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Roles</div>
+      <div class="value">6 User Types</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Tracking</div>
+      <div class="value">8 Milestones</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Author</div>
+      <div class="value">Manikumar</div>
+    </div>
+  </div>
+
+  <div class="cover-badge">Seminar Presentation — 2026</div>
+  <div class="cover-dots"><span></span><span></span><span></span></div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 2 — THE PROBLEM
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">01</div>
+  <div class="section-label">Chapter One</div>
+  <div class="chapter-title">The Problem<br/><span>Nobody Tracks What Happens Next</span></div>
+  <div class="divider"></div>
+
+  <div class="story">
+    <p class="lead">Every year, millions of young people complete vocational training programs. They receive their certificates, shake hands with their trainers, and walk out the door. And then… silence.</p>
+
+    <p>Traditional training portals are built to manage one thing: <strong>the training itself</strong>. They track enrollment, attendance, assessments, and certification. The moment a trainee walks out with a certificate, the system has no further interest in them.</p>
+
+    <p>But here is the real question that nobody was asking: <strong>Did the training actually change their life?</strong> Did they get a job? Is the salary better than before? Are they still employed six months later? Did they get promoted? Or did they slip back into unemployment?</p>
+  </div>
+
+  <div class="quote">
+    "We give out certificates like trophies — but we never find out if the training actually led to a better livelihood."
+    <cite>— The Gap That CareerLoop Was Built to Fill</cite>
+  </div>
+
+  <div class="story">
+    <p>This gap has enormous consequences. Without outcome data:</p>
+    <ul style="margin: 8px 0 14px 20px; color: var(--brown-900);">
+      <li style="margin-bottom: 6px; font-size: 12px;">Governments cannot evaluate whether training schemes are worth funding.</li>
+      <li style="margin-bottom: 6px; font-size: 12px;">Training providers have no feedback loop to improve their programs.</li>
+      <li style="margin-bottom: 6px; font-size: 12px;">Employers cannot find or trust verified, skilled candidates.</li>
+      <li style="margin-bottom: 6px; font-size: 12px;">Trainees have no digital record of their journey — just a paper certificate.</li>
+    </ul>
+
+    <p><strong>CareerLoop was built to close this gap permanently.</strong> It is not just a training management system. It is a <strong>longitudinal outcome intelligence platform</strong> — tracking every trainee's journey from the first day of training all the way to career stability, one year later and beyond.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="s-num">8</div>
+      <div class="s-label">Life Milestones Tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-num">6</div>
+      <div class="s-label">Stakeholder Roles</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-num">365</div>
+      <div class="s-label">Days of Follow-Up</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-num">AI</div>
+      <div class="s-label">Powered by Gemini</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 3 — THE SOLUTION
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">02</div>
+  <div class="section-label">Chapter Two</div>
+  <div class="chapter-title">The Solution<br/><span>The CareerLoop Ecosystem</span></div>
+  <div class="divider"></div>
+
+  <div class="story">
+    <p class="lead">CareerLoop is a full-stack web platform that connects four key stakeholders — Trainees, Trainers, Training Providers, Employers, and Government — into one unified, intelligent ecosystem.</p>
+    <p>Each role sees only what they need to see. Each role takes actions that matter to their work. And every single action feeds back into a living, breathing data intelligence system that helps everyone make better decisions.</p>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card">
+      <div class="role-icon">🎓</div>
+      <div class="role-name">Trainee / Student</div>
+      <div class="role-desc">The person at the center of everything. Uploads certificates, tracks employment, receives AI career guidance, and builds a verifiable digital profile.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">👨‍🏫</div>
+      <div class="role-name">Trainer</div>
+      <div class="role-desc">The instructor who delivers the program. Manages cohorts, monitors trainee progress, and provides feedback through the trainer portal.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🏫</div>
+      <div class="role-name">Training Provider</div>
+      <div class="role-desc">The institution — like an NSDC-accredited center — that hosts programs. Verifies certificates, tracks placement rates, and views cohort outcomes.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🏢</div>
+      <div class="role-name">Employer</div>
+      <div class="role-desc">Companies that hire trained talent. Browse verified profiles, conduct bulk credential checks, and report on retention and performance.</div>
+    </div>
+  </div>
+
+  <div class="role-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="role-card">
+      <div class="role-icon">🏛️</div>
+      <div class="role-name">Government / Admin</div>
+      <div class="role-desc">Policy makers who need real outcome data. View national dashboards, district heat maps, scheme performance, and evidence for policy decisions.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">⚙️</div>
+      <div class="role-name">Platform Administrator</div>
+      <div class="role-desc">The super-admin with full oversight. Manages user approvals, role assignments, audit logs, and system configuration across the entire platform.</div>
+    </div>
+  </div>
+
+  <div class="story" style="margin-top: 10px;">
+    <p>What makes CareerLoop unique is how these six roles are <strong>interconnected</strong>. A trainee uploads a certificate → the training provider verifies it → the employer trusts it → the government sees the aggregate employment rate. It is one continuous loop of accountability and intelligence.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 4 — RIYA'S STORY (TRAINEE)
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">03</div>
+  <div class="section-label">Chapter Three — The Trainee's Story</div>
+  <div class="chapter-title">Riya's Journey<br/><span>From Classroom to Career</span></div>
+  <div class="divider"></div>
+
+  <div class="persona">
+    <div class="persona-avatar">👩</div>
+    <div>
+      <div class="persona-name">Riya Sharma</div>
+      <div class="persona-role">Trainee — Retail Sales Excellence Program, Jaipur</div>
+      <div class="persona-story">Riya is 22 years old, from a small town in Rajasthan. She enrolled in a 3-month vocational training program in Retail Sales. Before CareerLoop, her only proof of completion was a printed certificate she kept in a folder at home. No employer could verify it. No one tracked whether she got a job.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p>With CareerLoop, Riya's experience is completely different. On Day 1 of her training, she is registered on the platform. Her progress — attendance, assessments, and skill scores — is logged in real-time.</p>
+
+    <p>When she completes the program, she doesn't just receive a paper certificate. She logs into her <strong>CareerLoop Trainee Portal</strong> and uploads her digital credential. She enters the certificate name, issuing authority, credential ID, and issue date. She selects her Training Provider from the list and clicks "Submit for Verification."</p>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">📤<br/>Upload Certificate</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📝<br/>Enter Details</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">🏫<br/>Select Provider</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">⏳<br/>Pending Review</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">✅<br/>Verified!</div>
+  </div>
+
+  <div class="story">
+    <p>Once verified, Riya's certificate appears in her <strong>Certification Wallet</strong> with a green "Verified" badge. Employers can now trust her credential — it has been authenticated by the institution itself.</p>
+
+    <p>Three months later, Riya gets a job at a retail chain in Jaipur. She logs this employment in CareerLoop — the company name, her role, and her starting salary. At the 30-day, 90-day, and 180-day marks, she receives automated check-in prompts asking: "Are you still employed? Has your salary changed?"</p>
+
+    <p>The platform's <strong>AI module</strong>, powered by Google Gemini, analyzes her profile and tells her: <em>"Based on your Retail Sales certification and 6 months of employment, we recommend upskilling in Visual Merchandising and Inventory Management to qualify for a Team Lead role."</em></p>
+  </div>
+
+  <div class="feature-list">
+    <div class="feature-pill">🏅 Certification Wallet</div>
+    <div class="feature-pill">✅ Provider Verification</div>
+    <div class="feature-pill">💼 Employment Tracking</div>
+    <div class="feature-pill">📅 Longitudinal Check-ins</div>
+    <div class="feature-pill">🤖 AI Career Guidance</div>
+    <div class="feature-pill">📊 Salary Progression</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 5 — TRAINER'S STORY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">04</div>
+  <div class="section-label">Chapter Four — The Trainer's Story</div>
+  <div class="chapter-title">Arjun's Dashboard<br/><span>The Trainer Who Finally Has Data</span></div>
+  <div class="divider"></div>
+
+  <div class="persona">
+    <div class="persona-avatar">👨</div>
+    <div>
+      <div class="persona-name">Arjun Mehta</div>
+      <div class="persona-role">Trainer — Electronics Repair & Maintenance, Pune</div>
+      <div class="persona-story">Arjun has been training young people in electronics repair for eight years. For most of those years, he had no way of knowing whether his students got jobs. He would train a batch, issue certificates, and never hear from them again. He had no idea if his teaching style, curriculum, or industry connections were actually making a difference.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p class="lead">CareerLoop gives Arjun something he never had before: a feedback loop between the classroom and the real world.</p>
+
+    <p>Arjun logs into his <strong>Trainer Portal</strong> every morning. He can see all his active cohorts — 32 trainees currently enrolled, 14 who have graduated, and their current employment statuses. He can see that <strong>78% of his graduates from the last batch are employed</strong>, and the average salary is ₹18,400 per month.</p>
+
+    <p>More importantly, he can see where trainees are struggling. The platform shows him which skill assessments had the lowest scores, and which graduates reported that certain topics felt "insufficient" in their check-in surveys. This direct feedback helps Arjun <strong>improve his curriculum in real-time</strong>.</p>
+
+    <p>When a trainee like Riya reports that she got promoted after 6 months, Arjun gets that satisfaction too — because the platform connects trainee outcomes back to the trainer who taught them.</p>
+  </div>
+
+  <div class="role-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="role-card">
+      <div class="role-icon">👥</div>
+      <div class="role-name">Cohort Management</div>
+      <div class="role-desc">View all active and past batches with trainee-level detail.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">📈</div>
+      <div class="role-name">Placement Rate</div>
+      <div class="role-desc">See what % of graduates secured employment after training.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🔄</div>
+      <div class="role-name">Curriculum Feedback</div>
+      <div class="role-desc">Outcome data closes the loop back to teaching quality.</div>
+    </div>
+  </div>
+
+  <div class="quote">
+    "For the first time in eight years, I know whether my students are actually doing well. CareerLoop made me a better trainer."
+    <cite>— The kind of trainer insight CareerLoop enables</cite>
+  </div>
+
+  <div class="story">
+    <p>The trainer role in CareerLoop represents a fundamental shift in how vocational education is evaluated — not by test scores or attendance, but by <strong>real-world livelihood outcomes</strong>.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 6 — TRAINING PROVIDER STORY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">05</div>
+  <div class="section-label">Chapter Five — The Training Provider's Story</div>
+  <div class="chapter-title">SkillBridge Academy<br/><span>Running an Institution on Data</span></div>
+  <div class="divider"></div>
+
+  <div class="persona">
+    <div class="persona-avatar">🏫</div>
+    <div>
+      <div class="persona-name">SkillBridge Academy, Hyderabad</div>
+      <div class="persona-role">Training Provider — NSDC Accredited, 12 Active Programs</div>
+      <div class="persona-story">SkillBridge Academy manages 12 training programs across sectors like IT, retail, construction, and healthcare. With 400+ active trainees across 8 trainers, managing certifications, verifying credentials, and tracking placements was a logistical nightmare — until CareerLoop.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p class="lead">The Training Provider portal is the institutional hub of CareerLoop — the command center for managing programs, verifying credentials, and seeing how every cohort is performing.</p>
+
+    <p>Every morning, SkillBridge's coordinator logs into the <strong>Provider Dashboard</strong> and sees a live snapshot: how many trainees are currently enrolled, how many certificates are awaiting verification, and what the overall placement rate looks like across all programs.</p>
+
+    <p>When Riya submitted her certificate for verification, it appeared in the provider's <strong>Certification Verification Queue</strong>. The coordinator opens her submission, reviews the uploaded document, confirms the credential ID matches their records, and clicks "Verify." Riya's certificate is now officially authenticated. If there's a discrepancy, they can "Reject" it with a reason — keeping the system honest.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">01</div>
+      <div class="timeline-content">
+        <div class="t-label">Enrollment</div>
+        <div class="t-title">Trainee Registers & Enrolls</div>
+        <div class="t-desc">Provider manages program enrollment and batch composition.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">02</div>
+      <div class="timeline-content">
+        <div class="t-label">Completion</div>
+        <div class="t-title">Certificate Submitted for Verification</div>
+        <div class="t-desc">Trainee uploads credential → Provider reviews and approves/rejects.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">03</div>
+      <div class="timeline-content">
+        <div class="t-label">Placement</div>
+        <div class="t-title">Employment Data Flows In</div>
+        <div class="t-desc">Trainees log jobs; provider sees real-time placement rates per program.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">04</div>
+      <div class="timeline-content">
+        <div class="t-label">Analytics</div>
+        <div class="t-title">Cohort Outcome Reports</div>
+        <div class="t-desc">Wage progression, retention at 6 months, sector-wise success rates.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p>SkillBridge Academy can now walk into their annual NSDC review with <strong>real outcome data</strong> — not estimates, not surveys, but verified employment records and salary progressions from the CareerLoop database. This builds credibility, secures funding, and helps them improve weaker programs.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 7 — EMPLOYER STORY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">06</div>
+  <div class="section-label">Chapter Six — The Employer's Story</div>
+  <div class="chapter-title">TechRetail Corp<br/><span>Hiring with Confidence</span></div>
+  <div class="divider"></div>
+
+  <div class="persona">
+    <div class="persona-avatar">🏢</div>
+    <div>
+      <div class="persona-name">TechRetail Corp — HR Department</div>
+      <div class="persona-role">Employer — Retail Chain, 200+ Stores Nationwide</div>
+      <div class="persona-story">TechRetail Corp hires 500+ frontline retail staff every quarter. Their biggest challenge: verifying candidate credentials. Fake certificates are rampant. Background checks are slow and expensive. They needed a better way to find trained, verified talent fast.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p class="lead">The Employer portal is CareerLoop's bridge between the training ecosystem and the job market. It gives employers something they've never had: a pool of pre-verified, outcome-tracked talent.</p>
+
+    <p>TechRetail's HR manager logs into the <strong>Employer Portal</strong> and opens the <strong>Talent Discovery</strong> section. She filters for trainees with Retail Sales certifications, within Rajasthan, with a verified employment status. Riya's profile appears — complete with her verified certificate, her 6-month employment history, and her AI-assessed skill profile.</p>
+
+    <p>There's no need to call SkillBridge Academy to confirm Riya's certificate. <strong>The verification already happened on the platform.</strong> The credential is authentic, timestamped, and signed off by the provider. TechRetail can extend an offer with full confidence.</p>
+  </div>
+
+  <div class="role-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="role-card">
+      <div class="role-icon">🔍</div>
+      <div class="role-name">Talent Discovery</div>
+      <div class="role-desc">Filter by skill, location, certification, and readiness level.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">✅</div>
+      <div class="role-name">Bulk Verification</div>
+      <div class="role-desc">Verify 50 candidate credentials in one API call — no manual checks.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">📊</div>
+      <div class="role-name">Outcome Reporting</div>
+      <div class="role-desc">Report on how trained hires are performing — closing the loop.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p>After hiring Riya, TechRetail's HR system reports back to CareerLoop: "Riya has been employed for 6 months, her performance rating is Excellent, and she was promoted to Senior Sales Associate." This <strong>employer-verified outcome</strong> is now the gold standard data point in the platform.</p>
+
+    <p>The employer isn't just a consumer of the platform — they are a <strong>data contributor</strong>. Their hiring and retention data feeds back into the intelligence loop, helping future trainees, providers, and government bodies understand what the job market actually demands.</p>
+  </div>
+
+  <div class="quote">
+    "We stopped spending 3 weeks on background checks. CareerLoop gives us pre-verified candidates. We just interview and hire."
+    <cite>— The efficiency CareerLoop creates for employers</cite>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 8 — GOVERNMENT STORY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">07</div>
+  <div class="section-label">Chapter Seven — The Government's Story</div>
+  <div class="chapter-title">Ministry of Skill Development<br/><span>Policy Built on Proof</span></div>
+  <div class="divider"></div>
+
+  <div class="persona">
+    <div class="persona-avatar">🏛️</div>
+    <div>
+      <div class="persona-name">National Skill Development Authority</div>
+      <div class="persona-role">Government Administrator — Policy & Scheme Oversight</div>
+      <div class="persona-story">Every year, the government allocates thousands of crores to vocational training schemes. But evaluating these schemes has always been based on enrollment numbers and certificates issued — not on actual employment outcomes. Until CareerLoop, there was no system that could tell them: "Did this ₹500 crore scheme actually work?"</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p class="lead">The Government Dashboard is the most powerful view in CareerLoop — a real-time, national-level intelligence window into the outcomes of every training scheme in the country.</p>
+
+    <p>A government administrator logs in and immediately sees an aggregate picture: <strong>how many trainees are currently enrolled</strong> across all providers, the <strong>national employment rate</strong> for scheme graduates, the <strong>average monthly wage progression</strong>, and the <strong>6-month and 12-month retention rates</strong>.</p>
+
+    <p>They can drill down into a <strong>District Heat Map</strong> — a geographic visualization that shows which districts have high employment rates and which are lagging. If Jaipur has an 85% employment rate but Jodhpur has only 42%, they can investigate: Is there a shortage of employers in Jodhpur? Is the training provider under-performing? Is the program curriculum outdated?</p>
+  </div>
+
+  <div class="role-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="role-card">
+      <div class="role-icon">🗺️</div>
+      <div class="role-name">District Heat Maps</div>
+      <div class="role-desc">Geographic employment outcome visualization across every district.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">📊</div>
+      <div class="role-name">National Dashboard</div>
+      <div class="role-desc">Aggregate metrics: trainees, employment rates, salary progression.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🏆</div>
+      <div class="role-name">Provider Rankings</div>
+      <div class="role-desc">Compare all training providers by outcome quality, not just enrollment.</div>
+    </div>
+  </div>
+
+  <div class="story">
+    <p>The <strong>Provider Performance League</strong> is a game-changer for policy. For the first time, the government can see which training providers are genuinely delivering outcomes versus which ones are just certifying trainees with no placement support.</p>
+
+    <p>This data directly drives <strong>evidence-backed policy decisions</strong>: funding renewal, accreditation status, scheme design, and geographic prioritization. The government can say, with data: "Electronic repair training in Karnataka has an 89% employment rate — we should expand this program. Beauty & Wellness in Bihar has a 31% rate — we need to restructure the curriculum and placement partnerships."</p>
+  </div>
+
+  <div class="quote">
+    "We finally have the data to answer Parliament's questions about vocational training outcomes. Not estimates — real numbers."
+    <cite>— The accountability CareerLoop creates for government schemes</cite>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 9 — THE 8 MILESTONES
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">08</div>
+  <div class="section-label">Chapter Eight</div>
+  <div class="chapter-title">The 8 Milestones<br/><span>Beyond the Certification Deadline</span></div>
+  <div class="divider"></div>
+
+  <div class="story">
+    <p class="lead">CareerLoop tracks every trainee across 8 longitudinal milestones — from their first day of training to 365 days of employment. This is the "loop" in CareerLoop.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">01</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage One</div>
+        <div class="t-title">TRAIN — Curriculum Delivery</div>
+        <div class="t-desc">NSDC-accredited programs are delivered and tracked. Attendance, assessments, and skill benchmarks are recorded in real-time.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">02</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Two</div>
+        <div class="t-title">CERTIFY — Digital Credentials</div>
+        <div class="t-desc">Trainees upload certifications to their Wallet. Providers verify authenticity. Credentials are now portable, trusted, and employer-ready.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">03</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Three</div>
+        <div class="t-title">PLACE — Job Matching</div>
+        <div class="t-desc">Employer portal connects verified trainees with opportunities. Placement assistance and apprenticeship tracking begins.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">04</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Four</div>
+        <div class="t-title">EMPLOY — First Job Logged</div>
+        <div class="t-desc">Trainee records employment: company, role, sector, and starting salary. Employer verification confirms the placement.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">05</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Five</div>
+        <div class="t-title">RETAIN — 30, 90, 180, 365-Day Check-ins</div>
+        <div class="t-desc">Automated longitudinal follow-ups verify continued employment, salary changes, and job satisfaction at key milestones.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">06</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Six</div>
+        <div class="t-title">PROGRESS — Wage & Role Advancement</div>
+        <div class="t-desc">Salary increments, promotions, and role changes are logged. Wage progression charts show the real return on training investment.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">07</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Seven</div>
+        <div class="t-title">ANALYZE — AI Skill Gap Diagnosis</div>
+        <div class="t-desc">Gemini AI analyzes the trainee's profile vs. market demand and generates personalized upskilling recommendations.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot" style="font-size:11px;">08</div>
+      <div class="timeline-content">
+        <div class="t-label">Stage Eight</div>
+        <div class="t-title">IMPROVE — Evidence-Backed Policy</div>
+        <div class="t-desc">Aggregate data from all trainees drives government scheme improvements, curriculum updates, and funding decisions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 10 — TECHNOLOGY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="chapter-number">09</div>
+  <div class="section-label">Chapter Nine</div>
+  <div class="chapter-title">The Technology<br/><span>Built for Scale & Security</span></div>
+  <div class="divider"></div>
+
+  <div class="story">
+    <p class="lead">CareerLoop is built on a modern, production-grade tech stack designed for reliability, type safety, and intelligent data management.</p>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-item">
+      <div class="tech-icon">▲</div>
+      <div><div class="tech-name">Next.js 14</div><div class="tech-role">Full-stack framework with App Router</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🔷</div>
+      <div><div class="tech-name">TypeScript 5.6</div><div class="tech-role">End-to-end type safety</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🔺</div>
+      <div><div class="tech-name">Prisma ORM</div><div class="tech-role">Type-safe database access</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🎨</div>
+      <div><div class="tech-name">Tailwind CSS</div><div class="tech-role">Beige & brown luxury design system</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🔐</div>
+      <div><div class="tech-name">NextAuth.js</div><div class="tech-role">Session-based authentication</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🤖</div>
+      <div><div class="tech-name">Google Gemini AI</div><div class="tech-role">Career intelligence & skill gap analysis</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">📊</div>
+      <div><div class="tech-name">Recharts</div><div class="tech-role">Data visualization & outcome charts</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🐳</div>
+      <div><div class="tech-name">Docker</div><div class="tech-role">Containerized deployment</div></div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">⚙️</div>
+      <div><div class="tech-name">GitHub Actions</div><div class="tech-role">CI/CD automated pipeline</div></div>
+    </div>
+  </div>
+
+  <div class="arch-box">
+    <span class="arch-comment">// CareerLoop Architecture</span><br/>
+    CLIENT (Next.js App Router)<br/>
+    &nbsp;&nbsp;└─► MIDDLEWARE (NextAuth Session + Role Guard)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─► API ROUTES (/api/trainee, /api/employer, /api/government ...)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─► PRISMA ORM (Type-safe queries)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─► SQLite DATABASE (18+ models)<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─► GOOGLE GEMINI AI (Skill intelligence)<br/><br/>
+    <span class="arch-comment">// Role Gating: Every route checks role before serving data</span><br/>
+    TRAINEE → /trainee/* &nbsp;&nbsp;| &nbsp;EMPLOYER → /employer/*<br/>
+    PROVIDER → /provider/* | &nbsp;GOVERNMENT → /government/*<br/>
+    TRAINER → /trainer/* &nbsp;&nbsp;| &nbsp;ADMIN → /admin/*
+  </div>
+
+  <div class="story">
+    <p>Security is built into every layer. Passwords are hashed with <strong>bcryptjs</strong>. Every API route validates the user's session and role before serving any data. An immutable <strong>Audit Log</strong> records every sensitive action — who changed what, and when. GDPR-compliant <strong>consent records</strong> are maintained for every user.</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 11 — IMPACT & CONCLUSION
+════════════════════════════════════════════════════════ -->
+<div class="page final-page">
+  <div style="max-width: 480px;">
+    <div style="font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--brown-300); margin-bottom: 20px;">The Conclusion</div>
+
+    <div style="font-family: 'DM Serif Display', serif; font-size: 38px; color: white; line-height: 1.2; margin-bottom: 20px;">
+      One Platform.<br/>Four Stories.<br/><span style="color: var(--brown-300);">Infinite Impact.</span>
+    </div>
+
+    <div style="width: 60px; height: 2px; background: var(--gold); margin-bottom: 28px;"></div>
+
+    <div style="font-size: 13px; color: var(--brown-200); line-height: 1.9; margin-bottom: 30px;">
+      Riya got her first verified digital credential and a job she loves.<br/>
+      Arjun became a better trainer because he could see his impact.<br/>
+      SkillBridge secured renewed funding with real outcome data.<br/>
+      TechRetail hired 50 verified candidates without a single fake certificate.<br/>
+      The government finally had proof that the scheme was working.
+    </div>
+
+    <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px; color: white; margin-bottom: 30px;">
+      "CareerLoop is not just software.<br/>It is a promise — that every skill will count."
+    </div>
+
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;">
+      <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px 20px; text-align: center;">
+        <div style="font-family: 'DM Serif Display', serif; font-size: 28px; color: white;">8</div>
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-300); margin-top: 4px;">Milestones</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px 20px; text-align: center;">
+        <div style="font-family: 'DM Serif Display', serif; font-size: 28px; color: white;">6</div>
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-300); margin-top: 4px;">Roles</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px 20px; text-align: center;">
+        <div style="font-family: 'DM Serif Display', serif; font-size: 28px; color: white;">18+</div>
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-300); margin-top: 4px;">DB Models</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 14px 20px; text-align: center;">
+        <div style="font-family: 'DM Serif Display', serif; font-size: 28px; color: white;">AI</div>
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-300); margin-top: 4px;">Powered</div>
+      </div>
+    </div>
+
+    <div style="font-size: 11px; color: var(--brown-400);">
+      github.com/manikumar1024/CareerLoop &nbsp;·&nbsp; Built by Manikumar &nbsp;·&nbsp; 2026
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
