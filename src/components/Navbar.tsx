@@ -24,6 +24,16 @@ export default function Navbar() {
 
   const role = (session?.user as any)?.role;
 
+  const handleSignOut = async () => {
+    try {
+      await signOut({ redirect: false, callbackUrl: "/signin" });
+    } catch (e) {
+      console.error("Sign out error:", e);
+    } finally {
+      window.location.href = "/signin";
+    }
+  };
+
   const getDashboardUrl = () => {
     if (!role) return "/signin";
     switch (role) {
@@ -88,9 +98,9 @@ export default function Navbar() {
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={handleSignOut}
                 title="Sign Out"
-                className="p-2 rounded-full text-muted hover:text-charcoal-800 hover:bg-sage-100 transition"
+                className="p-2 rounded-full text-muted hover:text-charcoal-800 hover:bg-sage-100 transition cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -153,8 +163,8 @@ export default function Navbar() {
                     Go to {role?.replace("_", " ")} Portal
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full py-2 rounded-xl text-xs font-medium text-muted hover:text-charcoal-800 text-center"
+                    onClick={handleSignOut}
+                    className="w-full py-2 rounded-xl text-xs font-medium text-muted hover:text-charcoal-800 text-center cursor-pointer"
                   >
                     Sign Out
                   </button>

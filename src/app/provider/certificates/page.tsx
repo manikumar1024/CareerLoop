@@ -12,10 +12,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+export const revalidate = 0;
+
 export default async function ProviderCertificatesQueuePage() {
   const user = await getCurrentUser();
   if (!user || (user.role !== "TRAINING_PROVIDER" && user.role !== "GOVERNMENT_ADMIN")) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const [pendingCerts, allCerts] = await Promise.all([
@@ -36,7 +38,7 @@ export default async function ProviderCertificatesQueuePage() {
     }),
   ]);
 
-  const verifiedCount = allCerts.filter((c) => c.status === "APPROVED").length;
+  const verifiedCount = allCerts.filter((c) => c.status === "APPROVED" || c.status === "VERIFIED").length;
   const rejectedCount = allCerts.filter((c) => c.status === "REJECTED").length;
 
   return (

@@ -18,6 +18,16 @@ export default function RoleHeader({
   userName,
   userEmail,
 }: RoleHeaderProps) {
+  const handleSignOut = async () => {
+    try {
+      await signOut({ redirect: false, callbackUrl: "/signin" });
+    } catch (e) {
+      console.error("Sign out error:", e);
+    } finally {
+      window.location.href = "/signin";
+    }
+  };
+
   return (
     <header className="w-full bg-white border-b border-border px-4 sm:px-8 py-3 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -59,8 +69,8 @@ export default function RoleHeader({
           </div>
 
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-sage-50/60 hover:bg-red-50 hover:border-red-200 hover:text-red-700 text-charcoal-700 text-xs font-semibold transition"
+            onClick={handleSignOut}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-sage-50/60 hover:bg-red-50 hover:border-red-200 hover:text-red-700 text-charcoal-700 text-xs font-semibold transition cursor-pointer"
             title="Secure Sign Out"
           >
             <LogOut className="w-3.5 h-3.5" />

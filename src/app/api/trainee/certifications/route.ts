@@ -219,6 +219,22 @@ export async function POST(req: Request) {
       },
     });
 
+    // Also sync to Certificate model for provider verification queue
+    await prisma.certificate.create({
+      data: {
+        studentId: user.id,
+        certificateName: title,
+        courseName: title,
+        issuingOrganization: issuingAuthority,
+        certificateExternalId: certificateNumber,
+        issueDate,
+        expiryDate,
+        fileUrl: credentialUrl,
+        status: submitForVerification ? "PENDING" : "APPROVED",
+        description: `Associated with ${certification.program.title}`,
+      },
+    }).catch((e) => console.error("Certificate sync error:", e));
+
     return NextResponse.json({
       success: true,
       certification,

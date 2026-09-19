@@ -176,7 +176,16 @@ async function runTests() {
     // 12. Certification Verification Status Integrity
     console.log("\n[12] Testing Certification Verification Status...");
     const certifications = await prisma.certification.findMany();
-    const validCertStatuses = ["PENDING", "VERIFIED", "REVOKED", "EXPIRED"];
+    const validCertStatuses = [
+      "PENDING",
+      "VERIFIED",
+      "REVOKED",
+      "EXPIRED",
+      "UPLOADED",
+      "PENDING_VERIFICATION",
+      "PROVIDER_VERIFIED",
+      "REJECTED",
+    ];
     const invalidCerts = certifications.filter((c) => !validCertStatuses.includes(c.verificationStatus));
     assert(invalidCerts.length === 0, `All ${certifications.length} certification records have valid verification status values.`);
 

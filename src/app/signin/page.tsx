@@ -26,15 +26,6 @@ export default function SignInDirectoryPage() {
       accent: "hover:border-emerald-600",
     },
     {
-      id: "trainer",
-      title: "Vocational Trainer Portal",
-      desc: "Manage assigned cohorts, student rosters, attendance tracking, and assessment grading.",
-      href: "/login/trainer",
-      icon: BookOpen,
-      badge: "Instructor Access",
-      accent: "hover:border-teal-600",
-    },
-    {
       id: "provider",
       title: "Training Provider Portal",
       desc: "Manage vocational programs, certified trainers, batch schedules, and placement outcomes.",
@@ -60,15 +51,6 @@ export default function SignInDirectoryPage() {
       icon: Landmark,
       badge: "Civic Authority",
       accent: "hover:border-amber-600",
-    },
-    {
-      id: "admin",
-      title: "System Administrator Console",
-      desc: "Platform governance, institutional onboarding, user moderation, and immutable audit logs.",
-      href: "/login/admin",
-      icon: ShieldAlert,
-      badge: "Root Administration",
-      accent: "hover:border-rose-600",
     },
   ];
 
@@ -101,7 +83,7 @@ export default function SignInDirectoryPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
           {portals.map((p) => {
             const Icon = p.icon;
             return (

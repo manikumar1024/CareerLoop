@@ -17,9 +17,11 @@ import {
   Plus,
 } from "lucide-react";
 
+export const revalidate = 0;
+
 export default async function TraineeCertificatesPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const certificates = await prisma.certificate.findMany({
     where: { studentId: user.id },
@@ -31,7 +33,9 @@ export default async function TraineeCertificatesPage() {
     orderBy: { uploadedAt: "desc" },
   });
 
-  const verifiedCount = certificates.filter((c) => c.status === "APPROVED").length;
+  const verifiedCount = certificates.filter(
+    (c) => c.status === "APPROVED" || c.status === "VERIFIED"
+  ).length;
   const pendingCount = certificates.filter((c) => c.status === "PENDING").length;
 
   return (
@@ -117,10 +121,10 @@ export default async function TraineeCertificatesPage() {
               </span>
             );
 
-            if (cert.status === "APPROVED") {
+            if (cert.status === "APPROVED" || cert.status === "VERIFIED") {
               statusBadge = (
                 <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified
                 </span>
               );
             } else if (cert.status === "REJECTED") {
